@@ -37,24 +37,24 @@ class PawnMovesCalculator {
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             ChessPosition moveOnePosition = new ChessPosition(position.getRow() + 1, position.getColumn());
             if (board.getPiece(moveOnePosition) == null) {
-                ChessMove moveOneSpace = new ChessMove(position, moveOnePosition, currentPiece.getPieceType());
+                ChessMove moveOneSpace = new ChessMove(position, moveOnePosition, null);
                 possibleMoves.add(moveOneSpace);
             }
             if (position.getRow() == 2) {
                 ChessPosition moveTwoPosition = new ChessPosition(position.getRow() + 2, position.getColumn());
                 if (board.getPiece(moveTwoPosition) == null && board.getPiece(moveOnePosition) == null) {
-                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, currentPiece.getPieceType());
+                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, null);
                     possibleMoves.add(moveTwoSpace);
                 }
             }
             ChessPosition diagLeft = new ChessPosition(position.getRow() + 1, position.getColumn() -1);
             if (board.getPiece(diagLeft) != null && board.getPiece(diagLeft).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                ChessMove moveDiagLeft = new ChessMove(position, diagLeft, currentPiece.getPieceType());
+                ChessMove moveDiagLeft = new ChessMove(position, diagLeft, null);
                 possibleMoves.add(moveDiagLeft);
             }
             ChessPosition diagRight = new ChessPosition(position.getRow() + 1, position.getColumn() + 1);
             if (board.getPiece(diagRight) != null && board.getPiece(diagRight).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                ChessMove moveDiagRight = new ChessMove(position, diagRight, currentPiece.getPieceType());
+                ChessMove moveDiagRight = new ChessMove(position, diagRight, null);
                 possibleMoves.add(moveDiagRight);
             }
         }
@@ -63,35 +63,35 @@ class PawnMovesCalculator {
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
             ChessPosition moveOnePosition = new ChessPosition(position.getRow() - 1, position.getColumn());
             if (board.getPiece(moveOnePosition) == null) {
-                ChessMove moveOneSpace = new ChessMove(position, moveOnePosition, currentPiece.getPieceType());
+                ChessMove moveOneSpace = new ChessMove(position, moveOnePosition, null);
                 possibleMoves.add(moveOneSpace);
             }
             if (position.getRow() == 7) {
                 ChessPosition moveTwoPosition = new ChessPosition(position.getRow() - 2, position.getColumn());
                 if (board.getPiece(moveTwoPosition) == null && board.getPiece(moveOnePosition) == null) {
-                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, currentPiece.getPieceType());
+                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, null);
                     possibleMoves.add(moveTwoSpace);
                 }
             }
             if (position.getRow() - 1 >= 1) {
                 ChessPosition diagLeft = new ChessPosition(position.getRow() - 1, position.getColumn() - 1);
                 if (board.getPiece(diagLeft) != null && board.getPiece(diagLeft).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    ChessMove moveDiagLeft = new ChessMove(position, diagLeft, currentPiece.getPieceType());
+                    ChessMove moveDiagLeft = new ChessMove(position, diagLeft, null);
                     possibleMoves.add(moveDiagLeft);
                 }
             }
             if (position.getRow() + 1 <= 8) {
                 ChessPosition diagRight = new ChessPosition(position.getRow() - 1, position.getColumn() + 1);
                 if (board.getPiece(diagRight) != null && board.getPiece(diagRight).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    ChessMove moveDiagRight = new ChessMove(position, diagRight, currentPiece.getPieceType());
+                    ChessMove moveDiagRight = new ChessMove(position, diagRight, null);
                     possibleMoves.add(moveDiagRight);
                 }
             }
         }
 
-        for (ChessMove moveOption : possibleMoves) {
-            System.out.printf("(%d, %d)", moveOption.getEndPosition().getRow(), moveOption.getEndPosition().getColumn());
-        }
+//        for (ChessMove moveOption : possibleMoves) {
+//            System.out.printf("(%d, %d)", moveOption.getEndPosition().getRow(), moveOption.getEndPosition().getColumn());
+//        }
         return possibleMoves;
 
     }
