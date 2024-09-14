@@ -35,17 +35,17 @@ class PawnMovesCalculator {
 
         //WHITE PIECES HERE
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            if (position.getRow() == 1) {
-                ChessPosition moveTwoPosition = new ChessPosition(position.getRow() + 2, position.getColumn());
-                if (board.getPiece(moveTwoPosition) == null) {
-                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, currentPiece.getPieceType());
-                    possibleMoves.add(moveTwoSpace);
-                }
-            }
             ChessPosition moveOnePosition = new ChessPosition(position.getRow() + 1, position.getColumn());
             if (board.getPiece(moveOnePosition) == null) {
                 ChessMove moveOneSpace = new ChessMove(position, moveOnePosition, currentPiece.getPieceType());
                 possibleMoves.add(moveOneSpace);
+            }
+            if (position.getRow() == 2) {
+                ChessPosition moveTwoPosition = new ChessPosition(position.getRow() + 2, position.getColumn());
+                if (board.getPiece(moveTwoPosition) == null && board.getPiece(moveOnePosition) == null) {
+                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, currentPiece.getPieceType());
+                    possibleMoves.add(moveTwoSpace);
+                }
             }
             ChessPosition diagLeft = new ChessPosition(position.getRow() + 1, position.getColumn() -1);
             if (board.getPiece(diagLeft) != null && board.getPiece(diagLeft).getTeamColor() == ChessGame.TeamColor.BLACK) {
@@ -61,17 +61,17 @@ class PawnMovesCalculator {
 
         //BLACK PIECES HERE!!!
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-            if (position.getRow() == 6) {
-                ChessPosition moveTwoPosition = new ChessPosition(position.getRow() - 2, position.getColumn());
-                if (board.getPiece(moveTwoPosition) == null) {
-                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, currentPiece.getPieceType());
-                    possibleMoves.add(moveTwoSpace);
-                }
-            }
             ChessPosition moveOnePosition = new ChessPosition(position.getRow() - 1, position.getColumn());
             if (board.getPiece(moveOnePosition) == null) {
                 ChessMove moveOneSpace = new ChessMove(position, moveOnePosition, currentPiece.getPieceType());
                 possibleMoves.add(moveOneSpace);
+            }
+            if (position.getRow() == 7) {
+                ChessPosition moveTwoPosition = new ChessPosition(position.getRow() - 2, position.getColumn());
+                if (board.getPiece(moveTwoPosition) == null && board.getPiece(moveOnePosition) == null) {
+                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, currentPiece.getPieceType());
+                    possibleMoves.add(moveTwoSpace);
+                }
             }
             if (position.getRow() - 1 >= 1) {
                 ChessPosition diagLeft = new ChessPosition(position.getRow() - 1, position.getColumn() - 1);
@@ -89,6 +89,9 @@ class PawnMovesCalculator {
             }
         }
 
+        for (ChessMove moveOption : possibleMoves) {
+            System.out.printf("(%d, %d)", moveOption.getEndPosition().getRow(), moveOption.getEndPosition().getColumn());
+        }
         return possibleMoves;
 
     }
