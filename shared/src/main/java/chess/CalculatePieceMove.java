@@ -189,6 +189,89 @@ class BishopMovesCalculator {
             }
         }
 
+        //BLACK PIECES HERE
+        if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+            //Moving to the backward left
+            int current_row = position.getRow();
+            int current_col = position.getColumn();
+            ChessPosition future_position = new ChessPosition(current_row + 1, current_col - 1);
+            while (future_position.getRow() <= 8 && future_position.getColumn() >= 1) {
+                if  (board.getPiece(future_position) == null) {
+                    ChessMove moveForeLeft = new ChessMove(position, future_position, null);
+                    possibleMoves.add(moveForeLeft);
+                    current_row += 1;
+                    current_col -= 1;
+                    future_position = new ChessPosition(current_row + 1, current_col - 1);
+                }
+                else if (board.getPiece(future_position).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    ChessMove moveForeLeft = new ChessMove(position, future_position, null);
+                    possibleMoves.add(moveForeLeft);
+                    break;
+                }
+                else { break; }
+            }
+
+            //Moving to the backward right
+            current_row = position.getRow();
+            current_col = position.getColumn();
+            future_position = new ChessPosition(current_row + 1, current_col + 1);
+            while (future_position.getRow() <= 8 && future_position.getColumn() <= 8) {
+                if  (board.getPiece(future_position) == null) {
+                    ChessMove moveForeLeft = new ChessMove(position, future_position, null);
+                    possibleMoves.add(moveForeLeft);
+                    current_row += 1;
+                    current_col += 1;
+                    future_position = new ChessPosition(current_row + 1, current_col + 1);
+                }
+                else if (board.getPiece(future_position).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    ChessMove moveForeLeft = new ChessMove(position, future_position, null);
+                    possibleMoves.add(moveForeLeft);
+                    break;
+                }
+                else { break; }
+            }
+
+            //Moving to the forward right
+            current_row = position.getRow();
+            current_col = position.getColumn();
+            future_position = new ChessPosition(current_row - 1, current_col + 1);
+            while (future_position.getRow() >= 1 && future_position.getColumn() <= 8) {
+                if  (board.getPiece(future_position) == null) {
+                    ChessMove moveForeLeft = new ChessMove(position, future_position, null);
+                    possibleMoves.add(moveForeLeft);
+                    current_row -= 1;
+                    current_col += 1;
+                    future_position = new ChessPosition(current_row - 1, current_col + 1);
+                }
+                else if (board.getPiece(future_position).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    ChessMove moveForeLeft = new ChessMove(position, future_position, null);
+                    possibleMoves.add(moveForeLeft);
+                    break;
+                }
+                else { break; }
+            }
+
+            //Moving to the forward left
+            current_row = position.getRow();
+            current_col = position.getColumn();
+            future_position = new ChessPosition(current_row - 1, current_col - 1);
+            while (future_position.getRow() >= 1 && future_position.getColumn() >= 1) {
+                if  (board.getPiece(future_position) == null) {
+                    ChessMove moveForeLeft = new ChessMove(position, future_position, null);
+                    possibleMoves.add(moveForeLeft);
+                    current_row -= 1;
+                    current_col -= 1;
+                    future_position = new ChessPosition(current_row - 1, current_col - 1);
+                }
+                else if (board.getPiece(future_position).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    ChessMove moveForeLeft = new ChessMove(position, future_position, null);
+                    possibleMoves.add(moveForeLeft);
+                    break;
+                }
+                else { break; }
+            }
+        }
+
         return possibleMoves;
     }
 }
