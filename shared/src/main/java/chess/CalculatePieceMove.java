@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -34,6 +35,41 @@ class PawnMovesCalculator {
 
     public PawnMovesCalculator() {}
 
+    public static ArrayList<ChessMove> checkPromoWhite(ChessPosition startPosition, ChessPosition endPosition) {
+        ArrayList<ChessMove> possibleMoves = new ArrayList<>();
+        if (endPosition.getRow() == 8) {
+            ArrayList<ChessPiece.PieceType> pieceTypes = new ArrayList<ChessPiece.PieceType>(Arrays.asList(ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN));
+            for (ChessPiece.PieceType promoType : pieceTypes){
+                ChessMove promoMove = new ChessMove(startPosition, endPosition, promoType);
+                possibleMoves.add(promoMove);
+            }
+        }
+        else {
+            ChessMove notPromoMove = new ChessMove(startPosition, endPosition, null);
+            possibleMoves.add(notPromoMove);
+        }
+
+        return possibleMoves;
+    }
+
+    public static ArrayList<ChessMove> checkPromoBlack(ChessPosition startPosition, ChessPosition endPosition) {
+        ArrayList<ChessMove> possibleMoves = new ArrayList<>();
+        if (endPosition.getRow() == 1) {
+            ArrayList<ChessPiece.PieceType> pieceTypes = new ArrayList<ChessPiece.PieceType>(Arrays.asList(ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN));
+            for (ChessPiece.PieceType promoType : pieceTypes){
+                ChessMove promoMove = new ChessMove(startPosition, endPosition, promoType);
+                possibleMoves.add(promoMove);
+            }
+        }
+        else {
+            ChessMove notPromoMove = new ChessMove(startPosition, endPosition, null);
+            possibleMoves.add(notPromoMove);
+        }
+
+        return possibleMoves;
+    }
+
+
     public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
         ChessPiece currentPiece = board.getPiece(position);
@@ -42,25 +78,21 @@ class PawnMovesCalculator {
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             ChessPosition moveOnePosition = new ChessPosition(position.getRow() + 1, position.getColumn());
             if (board.getPiece(moveOnePosition) == null) {
-                ChessMove moveOneSpace = new ChessMove(position, moveOnePosition, null);
-                possibleMoves.add(moveOneSpace);
+                possibleMoves = checkPromoWhite(position, moveOnePosition);
             }
             if (position.getRow() == 2) {
                 ChessPosition moveTwoPosition = new ChessPosition(position.getRow() + 2, position.getColumn());
                 if (board.getPiece(moveTwoPosition) == null && board.getPiece(moveOnePosition) == null) {
-                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, null);
-                    possibleMoves.add(moveTwoSpace);
+                    possibleMoves.addAll(checkPromoWhite(position, moveTwoPosition));
                 }
             }
             ChessPosition diagLeft = new ChessPosition(position.getRow() + 1, position.getColumn() -1);
             if (board.getPiece(diagLeft) != null && board.getPiece(diagLeft).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                ChessMove moveDiagLeft = new ChessMove(position, diagLeft, null);
-                possibleMoves.add(moveDiagLeft);
+                possibleMoves.addAll(checkPromoWhite(position, diagLeft));
             }
             ChessPosition diagRight = new ChessPosition(position.getRow() + 1, position.getColumn() + 1);
             if (board.getPiece(diagRight) != null && board.getPiece(diagRight).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                ChessMove moveDiagRight = new ChessMove(position, diagRight, null);
-                possibleMoves.add(moveDiagRight);
+                possibleMoves.addAll(checkPromoWhite(position, diagRight));
             }
         }
 
@@ -68,28 +100,24 @@ class PawnMovesCalculator {
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
             ChessPosition moveOnePosition = new ChessPosition(position.getRow() - 1, position.getColumn());
             if (board.getPiece(moveOnePosition) == null) {
-                ChessMove moveOneSpace = new ChessMove(position, moveOnePosition, null);
-                possibleMoves.add(moveOneSpace);
+                possibleMoves = checkPromoBlack(position, moveOnePosition);
             }
             if (position.getRow() == 7) {
                 ChessPosition moveTwoPosition = new ChessPosition(position.getRow() - 2, position.getColumn());
                 if (board.getPiece(moveTwoPosition) == null && board.getPiece(moveOnePosition) == null) {
-                    ChessMove moveTwoSpace = new ChessMove(position, moveTwoPosition, null);
-                    possibleMoves.add(moveTwoSpace);
+                    possibleMoves.addAll(checkPromoBlack(position, moveTwoPosition));
                 }
             }
             if (position.getRow() - 1 >= 1) {
                 ChessPosition diagLeft = new ChessPosition(position.getRow() - 1, position.getColumn() - 1);
                 if (board.getPiece(diagLeft) != null && board.getPiece(diagLeft).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    ChessMove moveDiagLeft = new ChessMove(position, diagLeft, null);
-                    possibleMoves.add(moveDiagLeft);
+                    possibleMoves.addAll(checkPromoBlack(position, diagLeft));
                 }
             }
             if (position.getRow() + 1 <= 8) {
                 ChessPosition diagRight = new ChessPosition(position.getRow() - 1, position.getColumn() + 1);
                 if (board.getPiece(diagRight) != null && board.getPiece(diagRight).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    ChessMove moveDiagRight = new ChessMove(position, diagRight, null);
-                    possibleMoves.add(moveDiagRight);
+                    possibleMoves.addAll(checkPromoBlack(position, diagRight));
                 }
             }
         }
