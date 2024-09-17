@@ -86,8 +86,10 @@ class PawnMovesCalculator {
         //WHITE PIECES HERE
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             ChessPosition moveOnePosition = new ChessPosition(position.getRow() + 1, position.getColumn());
-            if (board.getPiece(moveOnePosition) == null) {
-                possibleMoves = checkPromoWhite(position, moveOnePosition);
+            if (position.getRow() + 1 <= 8) {
+                if (board.getPiece(moveOnePosition) == null) {
+                    possibleMoves = checkPromoWhite(position, moveOnePosition);
+                }
             }
             if (position.getRow() == 2) {
                 ChessPosition moveTwoPosition = new ChessPosition(position.getRow() + 2, position.getColumn());
@@ -95,21 +97,27 @@ class PawnMovesCalculator {
                     possibleMoves.addAll(checkPromoWhite(position, moveTwoPosition));
                 }
             }
-            ChessPosition diagLeft = new ChessPosition(position.getRow() + 1, position.getColumn() -1);
-            if (board.getPiece(diagLeft) != null && board.getPiece(diagLeft).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                possibleMoves.addAll(checkPromoWhite(position, diagLeft));
+            if (position.getRow() + 1 <= 8 && position.getColumn() - 1 >= 1) {
+                ChessPosition diagLeft = new ChessPosition(position.getRow() + 1, position.getColumn() - 1);
+                if (board.getPiece(diagLeft) != null && board.getPiece(diagLeft).getTeamColor() == ChessGame.TeamColor.BLACK) {
+                    possibleMoves.addAll(checkPromoWhite(position, diagLeft));
+                }
             }
-            ChessPosition diagRight = new ChessPosition(position.getRow() + 1, position.getColumn() + 1);
-            if (board.getPiece(diagRight) != null && board.getPiece(diagRight).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                possibleMoves.addAll(checkPromoWhite(position, diagRight));
+            if (position.getRow() + 1 <= 8 && position.getColumn() + 1 <= 8) {
+                ChessPosition diagRight = new ChessPosition(position.getRow() + 1, position.getColumn() + 1);
+                if (board.getPiece(diagRight) != null && board.getPiece(diagRight).getTeamColor() == ChessGame.TeamColor.BLACK) {
+                    possibleMoves.addAll(checkPromoWhite(position, diagRight));
+                }
             }
         }
 
         //BLACK PIECES HERE!!!
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
             ChessPosition moveOnePosition = new ChessPosition(position.getRow() - 1, position.getColumn());
-            if (board.getPiece(moveOnePosition) == null) {
-                possibleMoves = checkPromoBlack(position, moveOnePosition);
+            if (moveOnePosition.getRow() >= 1) {
+                if (board.getPiece(moveOnePosition) == null) {
+                    possibleMoves = checkPromoBlack(position, moveOnePosition);
+                }
             }
             if (position.getRow() == 7) {
                 ChessPosition moveTwoPosition = new ChessPosition(position.getRow() - 2, position.getColumn());
@@ -117,13 +125,13 @@ class PawnMovesCalculator {
                     possibleMoves.addAll(checkPromoBlack(position, moveTwoPosition));
                 }
             }
-            if (position.getRow() - 1 >= 1) {
+            if (position.getRow() - 1 >= 1 && position.getColumn() - 1 >= 1) {
                 ChessPosition diagLeft = new ChessPosition(position.getRow() - 1, position.getColumn() - 1);
                 if (board.getPiece(diagLeft) != null && board.getPiece(diagLeft).getTeamColor() == ChessGame.TeamColor.WHITE) {
                     possibleMoves.addAll(checkPromoBlack(position, diagLeft));
                 }
             }
-            if (position.getRow() + 1 <= 8) {
+            if (position.getRow() - 1 >= 1 && position.getColumn() + 1 <= 8) {
                 ChessPosition diagRight = new ChessPosition(position.getRow() - 1, position.getColumn() + 1);
                 if (board.getPiece(diagRight) != null && board.getPiece(diagRight).getTeamColor() == ChessGame.TeamColor.WHITE) {
                     possibleMoves.addAll(checkPromoBlack(position, diagRight));
