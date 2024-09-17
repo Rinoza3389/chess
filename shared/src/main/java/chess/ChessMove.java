@@ -42,7 +42,7 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        throw new RuntimeException("Not implemented"); //NEED TO ADD THIS LATER BECAUSE I'M NOT SURE I UNDERSTAND WHAT IS GOING ON
+        return this.promotionPiece; //NEED TO ADD THIS LATER BECAUSE I'M NOT SURE I UNDERSTAND WHAT IS GOING ON
     }
 
     @Override
