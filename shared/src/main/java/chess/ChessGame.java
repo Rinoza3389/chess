@@ -61,7 +61,16 @@ public class ChessGame {
         ChessPosition moveStartPosition = move.getStartPosition();
         Collection<ChessMove> validMovesList = validMoves(moveStartPosition);
         if (validMovesList.contains(move)) {
-            ChessPiece movePiece =
+            if (move.getPromotionPiece() != null) {
+                ChessPiece movePiece = gameBoard.getPiece(moveStartPosition);
+                gameBoard.addPiece(moveStartPosition, null);
+                gameBoard.addPiece(move.getEndPosition(), movePiece);
+            }
+            else {
+                ChessPiece movePiece = new ChessPiece(gameBoard.getPiece(moveStartPosition).getTeamColor(), move.getPromotionPiece());
+                gameBoard.addPiece(moveStartPosition, null);
+                gameBoard.addPiece(move.getEndPosition(), movePiece);
+            }
         }
         else {
             throw new InvalidMoveException();
