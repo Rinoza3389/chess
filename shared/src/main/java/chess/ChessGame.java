@@ -10,6 +10,8 @@ import java.util.Collection;
  */
 public class ChessGame {
 
+    private ChessBoard gameBoard = new ChessBoard();
+
     public ChessGame() {
 
     }
@@ -58,10 +60,12 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition moveStartPosition = move.getStartPosition();
         Collection<ChessMove> validMovesList = validMoves(moveStartPosition);
-
-        //And then I'll check if the move I want to make is in the validMovesList.
-        //Make move if move in list
-        //Else throw InvalidMoveException
+        if (validMovesList.contains(move)) {
+            ChessPiece movePiece =
+        }
+        else {
+            throw new InvalidMoveException();
+        }
 
     }
 
@@ -102,7 +106,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        gameBoard = board;
     }
 
     /**
@@ -111,6 +115,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return gameBoard;
     }
 }
