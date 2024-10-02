@@ -133,7 +133,7 @@ public class ChessGame {
                 if (currPiece != null && currPiece.getTeamColor() != teamColor) {
                     Collection<ChessMove> possibleMoves = currPiece.pieceMoves(gameBoard, currPosition);
                     for (ChessMove moveOption : possibleMoves) {
-                        if (gameBoard.getPiece(moveOption.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING && gameBoard.getPiece(moveOption.getEndPosition()).getTeamColor() == teamColor) {
+                        if (gameBoard.getPiece(moveOption.getEndPosition()) != null && (gameBoard.getPiece(moveOption.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING && gameBoard.getPiece(moveOption.getEndPosition()).getTeamColor() == teamColor)) {
                             return true;
                         }
                     }
