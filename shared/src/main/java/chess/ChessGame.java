@@ -11,6 +11,7 @@ import java.util.Collection;
 public class ChessGame {
 
     private ChessBoard gameBoard = new ChessBoard();
+    //Need to add team turn here
 
     public ChessGame() {
 
@@ -48,7 +49,25 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        if (gameBoard.getPiece(startPosition) != null) {
+            ChessGame.TeamColor color = gameBoard.getPiece(startPosition).getTeamColor();
+            ChessPiece movingPiece = gameBoard.getPiece(startPosition);
+            Collection<ChessMove> possibleMoves = gameBoard.getPiece(startPosition).pieceMoves(gameBoard, startPosition);
+            for (ChessMove move : possibleMoves) {
+                ChessBoard testBoard = new ChessBoard(gameBoard);
+                testBoard.addPiece(move.getStartPosition(), null);
+                testBoard.addPiece(move.getEndPosition(), movingPiece);
+                ChessGame fakeGame = new ChessGame();
+                fakeGame.setBoard(testBoard);
+                if (fakeGame.isInCheck(color) || fakeGame.isInCheckmate(color)) {
+                    possibleMoves.remove(move);
+                }
+            }
+            return possibleMoves;
+        }
+        else {
+            return null;
+        }
     }
 
     /**
@@ -60,7 +79,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition moveStartPosition = move.getStartPosition();
         Collection<ChessMove> validMovesList = validMoves(moveStartPosition);
-        if (validMovesList.contains(move)) {
+        if (validMovesList.contains(move) && getTeamTurn() == gameBoard.getPiece(moveStartPosition).getTeamColor()) {
             if (move.getPromotionPiece() != null) {
                 ChessPiece movePiece = gameBoard.getPiece(moveStartPosition);
                 gameBoard.addPiece(moveStartPosition, null);
