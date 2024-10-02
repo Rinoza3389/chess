@@ -15,6 +15,21 @@ public class ChessBoard {
 //        resetBoard();
     }
 
+    public ChessBoard(ChessBoard other) {
+        ChessPiece[][] squares = new ChessPiece[8][8];
+        for (int i=1; i <= 8; i++){
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition currentPosition = new ChessPosition(i,j);
+                addPiece(currentPosition, other.getPiece(currentPosition));
+            }
+        }
+    }
+
+    @Override
+    public ChessBoard clone() {
+        return new ChessBoard(this);
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
