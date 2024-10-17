@@ -42,9 +42,30 @@ public class Server {
     }
 
     private Object registerHandler(Request req, Response res) throws DataAccessException {
-        var user = new Gson().fromJson(req.body(), model.UserData.class);
-        mainService.registerUser(user);
-        res.status(200);
-        return "I need to have it output user & authtoken";
+        var regRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
+        if (regRequest.username() == null || regRequest.password() == null || regRequest.email() == null) {
+            ErrorResponse failedRequest = new ErrorResponse(400, "Error: bad request");
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
+        try {
+            var regResponse = mainService.registerUser(regRequest);
+            if (regResponse instanceof RegisterResponse) {
+                res.status(200);
+                return new Gson().toJson(regResponse);
+            } else if (regResponse instanceof ErrorResponse) {
+                res.status(((ErrorResponse) regResponse).status());
+                return new Gson().toJson(regResponse);
+            } else {
+                ErrorResponse failedRequest = new ErrorResponse(400, "Error: bad request");
+                res.status(failedRequest.status());
+                return new Gson().toJson(failedRequest);
+            }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(400, "Error: bad request");
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
+
     }
 }

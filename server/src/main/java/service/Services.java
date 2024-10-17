@@ -1,6 +1,7 @@
 package service;
 import dataaccess.*;
 import model.*;
+import server.*;
 
 import javax.xml.crypto.Data;
 
@@ -16,13 +17,20 @@ public class Services {
         dataAccess.clear();
     }
 
-    public void registerUser(UserData user) throws DataAccessException {
+    public Object registerUser(RegisterRequest regRequest) throws DataAccessException {
+        UserData user = new UserData(regRequest.username(), regRequest.password(), regRequest.email());
+
         if (dataAccess.getUser(user.username()) == null) {
-            dataAccess.createUser(user);
-            dataAccess.createAuth(user.username());
+            try {
+                String username = dataAccess.createUser(user);
+                String authToken = dataAccess.createAuth(user.username());
+                return new RegisterResponse(username, authToken);
+            } catch (DataAccessException e) {
+                return new ErrorResponse(500, e.getMessage());
+            }
         }
         else {
-            throw new DataAccessException("Error: already taken");
+            return new ErrorResponse(403, "Error: already taken");
         }
     }
 }

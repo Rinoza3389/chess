@@ -23,15 +23,19 @@ public class MemoryDataAccess implements DataAccess {
         return AuthDataSet.get(authToken);
     }
 
-    public void createUser(UserData user) {
+    public String createUser(UserData user) {
         UserDataSet.put(user.username(), user);
+        return user.username();
     }
 
-    public void createAuth(String username) {
+    public String createAuth(String username) throws DataAccessException {
         String authToken = UUID.randomUUID().toString();
         if (AuthDataSet.get(authToken) == null) {
             AuthData auth = new AuthData(authToken, username);
             AuthDataSet.put(authToken, auth);
+            return authToken;
+        } else {
+            throw new DataAccessException("Error: generated authToken already exists. Try again.");
         }
     }
 }
