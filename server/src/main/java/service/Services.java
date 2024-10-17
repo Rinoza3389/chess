@@ -13,8 +13,13 @@ public class Services {
         this.dataAccess = new MemoryDataAccess();
     }
 
-    public void clear()  throws DataAccessException {
-        dataAccess.clear();
+    public Object clear()  throws DataAccessException {
+        try {
+            dataAccess.clear();
+            return null;
+        } catch (DataAccessException e) {
+            return new ErrorResponse(500, "Error: Something went wrong.");
+        }
     }
 
     public Object registerUser(RegisterRequest regRequest) throws DataAccessException {

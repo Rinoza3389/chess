@@ -36,9 +36,15 @@ public class Server {
     }
 
     private Object clearHandler(Request req, Response res) throws DataAccessException {
-        mainService.clear();
-        res.status(200);
-        return "";
+        var errorMaybe = mainService.clear();
+        if (errorMaybe instanceof ErrorResponse){
+            res.status(((ErrorResponse) errorMaybe).status());
+            return new Gson().toJson(errorMaybe);
+        }
+        else {
+            res.status(200);
+            return "";
+        }
     }
 
     private Object registerHandler(Request req, Response res) throws DataAccessException {
