@@ -23,6 +23,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clearHandler);
         Spark.post("/user", this::registerHandler);
+        Spark.post("/session", this::loginHandler);
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
 
@@ -74,4 +75,32 @@ public class Server {
         }
 
     }
+
+    private Object loginHandler(Request req, Response res) throws DataAccessException {
+        var loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
+        if (loginRequest.username() == null || loginRequest.password() == null) {
+            ErrorResponse failedRequest = new ErrorResponse(500, "Error: bad request");
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
+        try {
+            var loginResponse = mainService.loginUser(loginRequest);
+            if (loginResponse instanceof LoginResponse) {
+                res.status(200);
+                return new Gson().toJson(loginResponse);
+            } else if (loginResponse instanceof ErrorResponse) {
+                res.status(((ErrorResponse) loginResponse).status());
+                return new Gson().toJson(loginResponse);
+            } else {
+                ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+                res.status(failedRequest.status());
+                return new Gson().toJson(failedRequest);
+            }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, e.getMessage());
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
+    }
 }
+

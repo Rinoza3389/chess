@@ -38,4 +38,21 @@ public class Services {
             return new ErrorResponse(403, "Error: already taken");
         }
     }
+
+    public Object loginUser(LoginRequest logReq) throws DataAccessException {
+        UserData user = dataAccess.getUser(logReq.username());
+        if (user == null) {
+            ErrorResponse nouser = new ErrorResponse(401, "Error: unauthorized");
+            return nouser;
+        }
+        if (!user.password().equals(logReq.password())) {
+            ErrorResponse badpass = new ErrorResponse(401, "Error: unauthorized");
+            return badpass;
+        } else {
+            String authToken = dataAccess.createAuth(user.username());
+            LoginResponse logResult = new LoginResponse(user.username(), authToken);
+            return logResult;
+        }
+
+    }
 }
