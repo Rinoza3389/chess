@@ -38,4 +38,8 @@ public class MemoryDataAccess implements DataAccess {
             throw new DataAccessException("Error: generated authToken already exists. Try again.");
         }
     }
+
+    public void deleteAuth(String authToken) throws DataAccessException {
+        AuthDataSet.remove(authToken);
+    }
 }

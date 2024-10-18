@@ -55,4 +55,14 @@ public class Services {
         }
 
     }
+
+    public Object logoutUser(LogoutRequest logReq) throws DataAccessException {
+        AuthData authData = dataAccess.getAuth(logReq.authToken());
+        if (authData == null) {
+            ErrorResponse nouser = new ErrorResponse(401, "Error: unauthorized");
+            return nouser;
+        }
+        dataAccess.deleteAuth(logReq.authToken());
+        return null;
+    }
 }

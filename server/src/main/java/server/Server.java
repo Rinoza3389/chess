@@ -5,7 +5,7 @@ import spark.*;
 import dataaccess.DataAccessException;
 import service.*;
 
-import javax.xml.crypto.Data;
+
 
 public class Server {
 
@@ -24,6 +24,7 @@ public class Server {
         Spark.delete("/db", this::clearHandler);
         Spark.post("/user", this::registerHandler);
         Spark.post("/session", this::loginHandler);
+        Spark.delete("/session", this::logoutHandler);
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
 
@@ -91,6 +92,29 @@ public class Server {
             } else if (loginResponse instanceof ErrorResponse) {
                 res.status(((ErrorResponse) loginResponse).status());
                 return new Gson().toJson(loginResponse);
+            } else {
+                ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+                res.status(failedRequest.status());
+                return new Gson().toJson(failedRequest);
+            }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, e.getMessage());
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
+    }
+
+    private Object logoutHandler(Request req, Response res) throws DataAccessException {
+        var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        try {
+            var logoutResponse = mainService.logoutUser(logoutRequest);
+            if (logoutResponse == null) {
+                res.status(200);
+                return "";
+            } else if (logoutResponse instanceof ErrorResponse) {
+                res.status(((ErrorResponse) logoutResponse).status());
+                return new Gson().toJson(logoutResponse);
             } else {
                 ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
                 res.status(failedRequest.status());
