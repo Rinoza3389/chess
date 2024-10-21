@@ -14,4 +14,6 @@ public interface DataAccess {
     AuthData getAuth(String authToken) throws DataAccessException;
 
     void deleteAuth(String authToken) throws DataAccessException;
+
+    Integer createGame(String gameName) throws DataAccessException;
 }

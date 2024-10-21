@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import spark.*;
 import dataaccess.DataAccessException;
 import service.*;
@@ -25,6 +26,7 @@ public class Server {
         Spark.post("/user", this::registerHandler);
         Spark.post("/session", this::loginHandler);
         Spark.delete("/session", this::logoutHandler);
+        Spark.post("/game", this::createGameHandler);
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
 
@@ -115,6 +117,31 @@ public class Server {
             } else if (logoutResponse instanceof ErrorResponse) {
                 res.status(((ErrorResponse) logoutResponse).status());
                 return new Gson().toJson(logoutResponse);
+            } else {
+                ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+                res.status(failedRequest.status());
+                return new Gson().toJson(failedRequest);
+            }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, e.getMessage());
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
+    }
+
+    private Object createGameHandler(Request req, Response res) throws DataAccessException {
+        var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
+        var jsonObject = new Gson().fromJson(req.body().toString(), JsonObject.class);
+        String gameName = jsonObject.get("gameName").getAsString();
+        CreateGameRequest cgRequest = new CreateGameRequest(authToken, gameName);
+        try {
+            var cgResponse = mainService.createNewGame(cgRequest);
+            if (cgResponse instanceof CreateGameResponse) {
+                res.status(200);
+                return new Gson().toJson(cgResponse);
+            } else if (cgResponse instanceof ErrorResponse) {
+                res.status(((ErrorResponse) cgResponse).status());
+                return new Gson().toJson(cgResponse);
             } else {
                 ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
                 res.status(failedRequest.status());
