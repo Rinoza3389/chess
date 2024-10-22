@@ -4,6 +4,7 @@ import model.*;
 import server.*;
 
 import javax.xml.crypto.Data;
+import java.util.ArrayList;
 
 public class Services {
 
@@ -105,9 +106,19 @@ public class Services {
         }
         try {
             dataAccess.updateGame(joinReq.playerColor(), joinReq.gameID(), authData.username());
-            return null;
+            return new JoinResponse(true);
         } catch (DataAccessException e) {
             return new ErrorResponse(500, e.getMessage());
         }
+    }
+
+    public Object listAllGames(ListRequest lisReq) throws DataAccessException {
+        AuthData authData = dataAccess.getAuth(lisReq.authToken());
+        if (authData == null) {
+            ErrorResponse nouser = new ErrorResponse(401, "Error: unauthorized");
+            return nouser;
+        }
+        ArrayList<GameData> gamesList = dataAccess.listGames();
+        return new ListResponse(gamesList);
     }
 }

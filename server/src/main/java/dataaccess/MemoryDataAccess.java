@@ -1,6 +1,8 @@
 package dataaccess;
 import chess.ChessGame;
 import model.*;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.Random;
@@ -68,5 +70,10 @@ public class MemoryDataAccess implements DataAccess {
             newGameData = new GameData(gameID, curGameData.whiteUsername(), username, curGameData.gameName(), curGameData.game());
         }
         GameDataSet.put(gameID, newGameData);
+    }
+
+    public ArrayList<GameData> listGames() throws DataAccessException {
+        ArrayList<GameData> listOfGames = new ArrayList<GameData>(GameDataSet.values());
+        return listOfGames;
     }
 }

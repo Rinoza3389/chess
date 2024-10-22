@@ -1,6 +1,8 @@
 package dataaccess;
 import model.*;
 
+import java.util.ArrayList;
+
 public interface DataAccess {
 
     void clear() throws DataAccessException;
@@ -20,4 +22,6 @@ public interface DataAccess {
     GameData getGame(Integer gameID) throws DataAccessException;
 
     void updateGame(String playerColor, Integer gameID, String username) throws DataAccessException;
+
+    ArrayList<GameData> listGames() throws DataAccessException;
 }

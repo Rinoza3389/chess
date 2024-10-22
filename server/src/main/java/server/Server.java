@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import dataaccess.DataAccess;
 import spark.*;
 import dataaccess.DataAccessException;
 import service.*;
@@ -28,6 +29,7 @@ public class Server {
         Spark.delete("/session", this::logoutHandler);
         Spark.post("/game", this::createGameHandler);
         Spark.put("/game", this::joinHandler);
+        Spark.get("/game", this::listHandler);
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
 
@@ -156,19 +158,29 @@ public class Server {
     }
 
     private Object joinHandler(Request req, Response res) throws DataAccessException {
-        var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
+        String authToken;
+        try {
+            authToken = new Gson().fromJson(req.headers("authorization"), String.class);
+        } catch (Exception e) {
+            ErrorResponse failedRequest = new ErrorResponse(401, "Error: unauthorized");
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
         var jsonObject = new Gson().fromJson(req.body(), JsonObject.class);
-        String playerColor = jsonObject.get("playerColor").getAsString();
-        Integer gameID = jsonObject.get("gameID").getAsInt();
-        JoinRequest joinRequest = new JoinRequest(authToken, playerColor, gameID);
-        if (joinRequest.authToken() == null || joinRequest.playerColor() == null || joinRequest.gameID() == null) {
+        String playerColor;
+        Integer gameID;
+        try {
+            playerColor = jsonObject.get("playerColor").getAsString();
+            gameID = jsonObject.get("gameID").getAsInt();
+        } catch (NullPointerException e) {
             ErrorResponse failedRequest = new ErrorResponse(400, "Error: bad request");
             res.status(failedRequest.status());
             return new Gson().toJson(failedRequest);
         }
+        JoinRequest joinRequest = new JoinRequest(authToken, playerColor, gameID);
         try {
             var joinResponse = mainService.joinGame(joinRequest);
-            if (joinResponse == null) {
+            if (joinResponse instanceof JoinResponse) {
                 res.status(200);
                 return "";
             }
@@ -181,6 +193,29 @@ public class Server {
                 res.status(failedRequest.status());
                 return new Gson().toJson(failedRequest);
             }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, e.getMessage());
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
+    }
+
+    private Object listHandler(Request req, Response res) throws DataAccessException {
+        var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
+        ListRequest lisReq = new ListRequest(authToken);
+        try {
+            var lisRes = mainService.listAllGames(lisReq);
+            if (lisRes instanceof ListResponse) {
+                res.status(200);
+                return new Gson().toJson(lisRes);
+            }
+            if (lisRes instanceof ErrorResponse) {
+                res.status(((ErrorResponse) lisRes).status());
+                return new Gson().toJson(lisRes);
+            }
+            ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
         } catch (DataAccessException e) {
             ErrorResponse failedRequest = new ErrorResponse(500, e.getMessage());
             res.status(failedRequest.status());
