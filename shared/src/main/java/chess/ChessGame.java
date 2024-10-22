@@ -109,7 +109,8 @@ public class ChessGame {
                 movePiece = new ChessPiece(gameBoard.getPiece(moveStartPosition).getTeamColor(), move.getPromotionPiece());
             }
             else {
-                movePiece = new ChessPiece(gameBoard.getPiece(moveStartPosition).getTeamColor(), gameBoard.getPiece(moveStartPosition).getPieceType());
+                ChessPiece oldPiece = gameBoard.getPiece(moveStartPosition);
+                movePiece = new ChessPiece(oldPiece.getTeamColor(), oldPiece.getPieceType());
             }
             gameBoard.addPiece(moveStartPosition, null);
             gameBoard.addPiece(move.getEndPosition(), movePiece);
@@ -140,7 +141,9 @@ public class ChessGame {
                 if (currPiece != null && currPiece.getTeamColor() != teamColor) {
                     Collection<ChessMove> possibleMoves = currPiece.pieceMoves(gameBoard, currPosition);
                     for (ChessMove moveOption : possibleMoves) {
-                        if (gameBoard.getPiece(moveOption.getEndPosition()) != null && (gameBoard.getPiece(moveOption.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING && gameBoard.getPiece(moveOption.getEndPosition()).getTeamColor() == teamColor)) {
+                        ChessPosition endPosition = moveOption.getEndPosition();
+                        ChessPiece endPiece = gameBoard.getPiece(endPosition);
+                        if (endPiece != null && (endPiece.getPieceType() == ChessPiece.PieceType.KING && endPiece.getTeamColor() == teamColor)) {
                             return true;
                         }
                     }
