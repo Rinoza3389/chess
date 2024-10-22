@@ -68,18 +68,15 @@ public class Services {
     }
 
     public Object createNewGame(CreateGameRequest cgReq) throws DataAccessException {
-        if (cgReq.authToken() == null || !(cgReq.authToken() instanceof String)) {
-            ErrorResponse badReq = new ErrorResponse(400, "Error: bad request");
-            return badReq;
+        if (cgReq.authToken() == null) {
+            return new ErrorResponse(400, "Error: bad request");
         }
         AuthData authData = dataAccess.getAuth(cgReq.authToken());
         if (authData == null) {
-            ErrorResponse nouser = new ErrorResponse(401, "Error: unauthorized");
-            return nouser;
+            return new ErrorResponse(401, "Error: unauthorized");
         }
         Integer gameID = dataAccess.createGame(cgReq.gameName());
-        CreateGameResponse cgRes = new CreateGameResponse(gameID);
-        return cgRes;
+        return new CreateGameResponse(gameID);
     }
 
     public Object joinGame(JoinRequest joinReq) throws DataAccessException {
