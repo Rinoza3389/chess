@@ -74,7 +74,7 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         if (gameBoard.getPiece(startPosition) != null) {
             Collection<ChessMove> returnMoves = new ArrayList<>();
-            ChessGame.TeamColor color = gameBoard.getPiece(startPosition).getTeamColor();
+            TeamColor color = gameBoard.getPiece(startPosition).getTeamColor();
             ChessPiece movingPiece = gameBoard.getPiece(startPosition);
             Collection<ChessMove> possibleMoves = gameBoard.getPiece(startPosition).pieceMoves(gameBoard, startPosition);
             for (ChessMove move : possibleMoves) {
@@ -138,14 +138,14 @@ public class ChessGame {
             for (int j=1; j<=8; j++){
                 ChessPosition currPosition = new ChessPosition(i,j);
                 ChessPiece currPiece = gameBoard.getPiece(currPosition);
+                Collection<ChessMove> possibleMoves = new ArrayList<>();
                 if (currPiece != null && currPiece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> possibleMoves = currPiece.pieceMoves(gameBoard, currPosition);
-                    for (ChessMove moveOption : possibleMoves) {
-                        ChessPosition endPosition = moveOption.getEndPosition();
-                        ChessPiece endPiece = gameBoard.getPiece(endPosition);
-                        if (endPiece != null && (endPiece.getPieceType() == ChessPiece.PieceType.KING && endPiece.getTeamColor() == teamColor)) {
-                            return true;
-                        }
+                    possibleMoves = currPiece.pieceMoves(gameBoard, currPosition);}
+                for (ChessMove moveOption : possibleMoves) {
+                    ChessPosition endPosition = moveOption.getEndPosition();
+                    ChessPiece endPiece = gameBoard.getPiece(endPosition);
+                    if (endPiece != null && (endPiece.getPieceType() == ChessPiece.PieceType.KING && endPiece.getTeamColor() == teamColor)) {
+                        return true;
                     }
                 }
             }
@@ -160,32 +160,28 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) {
-            boolean checkMate = true;
-            for (int i = 1; i <= 8; i++) {
-                for (int j = 1; j <= 8; j++) {
-                    ChessPosition currPosition = new ChessPosition(i, j);
-                    ChessPiece currPiece = gameBoard.getPiece(currPosition);
-                    if (currPiece != null && currPiece.getTeamColor() == teamColor) {
-                        Collection<ChessMove> possibleMoves = currPiece.pieceMoves(gameBoard, currPosition);
-                        for (ChessMove moveOption : possibleMoves) {
-                            ChessBoard testBoard = new ChessBoard(gameBoard);
-                            testBoard.addPiece(moveOption.getStartPosition(), null);
-                            testBoard.addPiece(moveOption.getEndPosition(), currPiece);
-                            ChessGame fakeGame = new ChessGame();
-                            fakeGame.setBoard(testBoard);
-                            if (!fakeGame.isInCheck(teamColor)) {
-                                checkMate = false;
-                            }
-                        }
+        if (!isInCheck(teamColor)) {return false;}
+        boolean checkMate = true;
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition currPosition = new ChessPosition(i, j);
+                ChessPiece currPiece = gameBoard.getPiece(currPosition);
+                Collection<ChessMove> possibleMoves = new ArrayList<>();
+                if (currPiece != null && currPiece.getTeamColor() == teamColor) {
+                    possibleMoves = currPiece.pieceMoves(gameBoard, currPosition);}
+                for (ChessMove moveOption : possibleMoves) {
+                    ChessBoard testBoard = new ChessBoard(gameBoard);
+                    testBoard.addPiece(moveOption.getStartPosition(), null);
+                    testBoard.addPiece(moveOption.getEndPosition(), currPiece);
+                    ChessGame fakeGame = new ChessGame();
+                    fakeGame.setBoard(testBoard);
+                    if (!fakeGame.isInCheck(teamColor)) {
+                        checkMate = false;
                     }
                 }
             }
-            return checkMate;
         }
-        else {
-            return false;
-        }
+        return checkMate;
     }
 
     /**
@@ -196,24 +192,20 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (!isInCheckmate(teamColor)) {
-            boolean stalemate = true;
-            for (int i = 1; i <= 8; i++) {
-                for (int j = 1; j <= 8; j++) {
-                    ChessPosition currPosition = new ChessPosition(i, j);
-                    ChessPiece currPiece = gameBoard.getPiece(currPosition);
-                    if (currPiece != null && currPiece.getTeamColor() == teamColor) {
-                        if (!validMoves(currPosition).isEmpty()) {
-                            stalemate = false;
-                        }
+        if (isInCheckmate(teamColor)) { return false;}
+        boolean stalemate = true;
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition currPosition = new ChessPosition(i, j);
+                ChessPiece currPiece = gameBoard.getPiece(currPosition);
+                if (currPiece != null && currPiece.getTeamColor() == teamColor) {
+                    if (!validMoves(currPosition).isEmpty()) {
+                        stalemate = false;
                     }
                 }
             }
-            return stalemate;
         }
-        else {
-            return false;
-        }
+        return stalemate;
     }
 
     /**

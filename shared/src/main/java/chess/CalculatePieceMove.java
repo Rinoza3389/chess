@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -14,18 +13,23 @@ public class CalculatePieceMove {
 
     public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         ChessPiece currentPiece = board.getPiece(position);
+        ChessGame.TeamColor opposingColor;
+        if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            opposingColor = ChessGame.TeamColor.BLACK;
+        } else { opposingColor = ChessGame.TeamColor.WHITE;}
+
         if (currentPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
             return PawnMovesCalculator.pieceMoves(board, position);}
         else if (currentPiece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-            return BishopMovesCalculator.pieceMoves(board, position);}
+            return BishopMovesCalculator.actuallyMove(board, position, opposingColor);}
         else if (currentPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
-            return RookMovesCalculator.pieceMoves(board, position);}
+            return RookMovesCalculator.actuallyMoving(board, position, opposingColor);}
         else if (currentPiece.getPieceType() == ChessPiece.PieceType.QUEEN) {
-            return QueenMovesCalculator.pieceMoves(board, position);}
+            return QueenMovesCalculator.pieceMoves(board, position, opposingColor);}
         else if (currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
-            return KingMovesCalculator.pieceMoves(board, position);}
+            return KingMovesCalculator.actuallyMoveKing(board, position, opposingColor);}
         else if(currentPiece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
-            return KnightMovesCalculator.pieceMoves(board, position);}
+            return KnightMovesCalculator.actuallyMove(board, position, opposingColor);}
         return new ArrayList<>();
     }
 }
@@ -40,7 +44,11 @@ class PawnMovesCalculator {
             endRow = 1;
         }
         if (endPosition.getRow() == endRow) {
-            ArrayList<ChessPiece.PieceType> pieceTypes = new ArrayList<>(Arrays.asList(ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN));
+            ArrayList<ChessPiece.PieceType> pieceTypes = new ArrayList<>();
+            pieceTypes.add(ChessPiece.PieceType.KNIGHT);
+            pieceTypes.add(ChessPiece.PieceType.QUEEN);
+            pieceTypes.add(ChessPiece.PieceType.BISHOP);
+            pieceTypes.add(ChessPiece.PieceType.ROOK);
             for (ChessPiece.PieceType promoType : pieceTypes){
                 ChessMove promoMove = new ChessMove(startPosition, endPosition, promoType);
                 possibleMoves.add(promoMove);
@@ -194,20 +202,6 @@ class BishopMovesCalculator {
         }
         return possibleMoves;
     }
-
-    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        ArrayList<ChessMove> possibleMoves = new ArrayList<>();
-        ChessPiece currentPiece = board.getPiece(position);
-        //WHITE PIECES HERE
-        if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            return actuallyMove(board, position, ChessGame.TeamColor.BLACK);
-        }
-        //BLACK PIECES HERE
-        if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-            return actuallyMove(board, position, ChessGame.TeamColor.WHITE);
-        }
-        return possibleMoves;
-    }
 }
 
 class RookMovesCalculator {
@@ -287,33 +281,19 @@ class RookMovesCalculator {
         }
         return possibleMoves;
     }
-
-    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        ArrayList<ChessMove> possibleMoves = new ArrayList<>();
-        ChessPiece currentPiece = board.getPiece(position);
-        //WHITE PIECES
-        if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            return actuallyMoving(board, position, ChessGame.TeamColor.BLACK);
-        }
-        //BLACK PIECES
-        if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-            return actuallyMoving(board, position, ChessGame.TeamColor.WHITE);
-        }
-        return possibleMoves;
-    }
 }
 
 class QueenMovesCalculator {
-    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
+    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor opposingTeamColor) {
         Collection<ChessMove> possibleMoves;
-        possibleMoves = RookMovesCalculator.pieceMoves(board, position);
-        possibleMoves.addAll(BishopMovesCalculator.pieceMoves(board,position));
+        possibleMoves = RookMovesCalculator.actuallyMoving(board, position,opposingTeamColor);
+        possibleMoves.addAll(BishopMovesCalculator.actuallyMove(board,position,opposingTeamColor));
         return possibleMoves;
     }
 }
 
 class KingMovesCalculator {
-    public static Collection<ChessMove> actuallyMove(ChessBoard board, ChessPosition position, ChessGame.TeamColor opposingTeam) {
+    public static Collection<ChessMove> actuallyMoveKing(ChessBoard board, ChessPosition position, ChessGame.TeamColor opposingTeam) {
         ArrayList<ChessMove> possibleMoves = new ArrayList<>();
         //Forward
         if (position.getRow() <= 7) {
@@ -378,20 +358,6 @@ class KingMovesCalculator {
                 ChessMove moveBackRight = new ChessMove(position, moveBackRightPos, null);
                 possibleMoves.add(moveBackRight);
             }
-        }
-        return possibleMoves;
-    }
-
-    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        ArrayList<ChessMove> possibleMoves = new ArrayList<>();
-        ChessPiece currentPiece = board.getPiece(position);
-        //WHITE PIECES HERE
-        if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            return actuallyMove(board, position, ChessGame.TeamColor.BLACK);
-        }
-        //BLACK PIECES HERE
-        if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-            return actuallyMove(board, position, ChessGame.TeamColor.WHITE);
         }
         return possibleMoves;
     }
@@ -463,19 +429,6 @@ class KnightMovesCalculator {
                 ChessMove back1right2 = new ChessMove(position, back1right2Pos, null);
                 possibleMoves.add(back1right2);
             }
-        }
-        return possibleMoves;
-    }
-
-    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        ArrayList<ChessMove> possibleMoves = new ArrayList<>();
-        //WHITE PIECES HERE
-        if (board.getPiece(position).getTeamColor()==ChessGame.TeamColor.WHITE) {
-            return actuallyMove(board, position, ChessGame.TeamColor.BLACK);
-        }
-        //BLACK PIECES HERE
-        if (board.getPiece(position).getTeamColor()==ChessGame.TeamColor.BLACK) {
-            return actuallyMove(board, position, ChessGame.TeamColor.WHITE);
         }
         return possibleMoves;
     }
