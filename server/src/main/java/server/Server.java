@@ -27,6 +27,7 @@ public class Server {
         Spark.post("/session", this::loginHandler);
         Spark.delete("/session", this::logoutHandler);
         Spark.post("/game", this::createGameHandler);
+        Spark.put("/game", this::joinHandler);
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
 
@@ -143,6 +144,39 @@ public class Server {
                 res.status(((ErrorResponse) cgResponse).status());
                 return new Gson().toJson(cgResponse);
             } else {
+                ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+                res.status(failedRequest.status());
+                return new Gson().toJson(failedRequest);
+            }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, e.getMessage());
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
+    }
+
+    private Object joinHandler(Request req, Response res) throws DataAccessException {
+        var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
+        var jsonObject = new Gson().fromJson(req.body(), JsonObject.class);
+        String playerColor = jsonObject.get("playerColor").getAsString();
+        Integer gameID = jsonObject.get("gameID").getAsInt();
+        JoinRequest joinRequest = new JoinRequest(authToken, playerColor, gameID);
+        if (joinRequest.authToken() == null || joinRequest.playerColor() == null || joinRequest.gameID() == null) {
+            ErrorResponse failedRequest = new ErrorResponse(400, "Error: bad request");
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        }
+        try {
+            var joinResponse = mainService.joinGame(joinRequest);
+            if (joinResponse == null) {
+                res.status(200);
+                return "";
+            }
+            else if (joinResponse instanceof ErrorResponse){
+                res.status(((ErrorResponse) joinResponse).status());
+                return new Gson().toJson(joinResponse);
+            }
+            else {
                 ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
                 res.status(failedRequest.status());
                 return new Gson().toJson(failedRequest);

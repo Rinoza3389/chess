@@ -53,4 +53,20 @@ public class MemoryDataAccess implements DataAccess {
         GameDataSet.put(gameID, game);
         return gameID;
     }
+
+    public GameData getGame(Integer gameID) throws DataAccessException {
+        GameData curGameData = GameDataSet.get(gameID);
+        return curGameData;
+    }
+
+    public void updateGame(String playerColor, Integer gameID, String username) throws DataAccessException {
+        GameData curGameData = GameDataSet.get(gameID);
+        GameData newGameData;
+        if (playerColor.equals("WHITE")) {
+            newGameData = new GameData(gameID, username, curGameData.blackUsername(), curGameData.gameName(), curGameData.game());
+        } else {
+            newGameData = new GameData(gameID, curGameData.whiteUsername(), username, curGameData.gameName(), curGameData.game());
+        }
+        GameDataSet.put(gameID, newGameData);
+    }
 }

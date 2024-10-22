@@ -80,4 +80,34 @@ public class Services {
         CreateGameResponse cgRes = new CreateGameResponse(gameID);
         return cgRes;
     }
+
+    public Object joinGame(JoinRequest joinReq) throws DataAccessException {
+        AuthData authData = dataAccess.getAuth(joinReq.authToken());
+        if (authData == null) {
+            ErrorResponse nouser = new ErrorResponse(401, "Error: unauthorized");
+            return nouser;
+        }
+        GameData gameData = dataAccess.getGame(joinReq.gameID());
+        if (gameData == null) {
+            ErrorResponse nogame = new ErrorResponse(400, "Error: bad request");
+            return nogame;
+        }
+        if (joinReq.playerColor().equals("WHITE")) {
+            if (!(gameData.whiteUsername() == null)) {
+                ErrorResponse usertaken = new ErrorResponse(403, "Error: already taken");
+                return usertaken;
+            }
+        } else {
+            if (!(gameData.blackUsername() == null)) {
+                ErrorResponse usertaken = new ErrorResponse(403, "Error: already taken");
+                return usertaken;
+            }
+        }
+        try {
+            dataAccess.updateGame(joinReq.playerColor(), joinReq.gameID(), authData.username());
+            return null;
+        } catch (DataAccessException e) {
+            return new ErrorResponse(500, e.getMessage());
+        }
+    }
 }
