@@ -14,15 +14,11 @@ public class Services {
     }
 
     public Object clear() {
-        try {
-            dataAccess.clear();
-            return null;
-        } catch (DataAccessException e) {
-            return new ErrorResponse(500, "Error: Something went wrong.");
-        }
+        dataAccess.clear();
+        return null;
     }
 
-    public Object registerUser(RegisterRequest regRequest) throws DataAccessException {
+    public Object registerUser(RegisterRequest regRequest) {
         UserData user = new UserData(regRequest.username(), regRequest.password(), regRequest.email());
 
         if (dataAccess.getUser(user.username()) == null) {
@@ -53,7 +49,7 @@ public class Services {
 
     }
 
-    public Object logoutUser(LogoutRequest logReq) throws DataAccessException {
+    public Object logoutUser(LogoutRequest logReq) {
         AuthData authData = dataAccess.getAuth(logReq.authToken());
         if (authData == null) {
             return new ErrorResponse(401, "Error: unauthorized");
@@ -62,7 +58,7 @@ public class Services {
         return null;
     }
 
-    public Object createNewGame(CreateGameRequest cgReq) throws DataAccessException {
+    public Object createNewGame(CreateGameRequest cgReq) {
         if (cgReq.authToken() == null) {
             return new ErrorResponse(400, "Error: bad request");
         }
@@ -74,7 +70,7 @@ public class Services {
         return new CreateGameResponse(gameID);
     }
 
-    public Object joinGame(JoinRequest joinReq) throws DataAccessException {
+    public Object joinGame(JoinRequest joinReq) {
         AuthData authData = dataAccess.getAuth(joinReq.authToken());
         if (authData == null) {
             return new ErrorResponse(401, "Error: unauthorized");
@@ -92,15 +88,11 @@ public class Services {
                 return new ErrorResponse(403, "Error: already taken");
             }
         }
-        try {
-            dataAccess.updateGame(joinReq.playerColor(), joinReq.gameID(), authData.username());
-            return new JoinResponse(true);
-        } catch (DataAccessException e) {
-            return new ErrorResponse(500, e.getMessage());
-        }
+        dataAccess.updateGame(joinReq.playerColor(), joinReq.gameID(), authData.username());
+        return new JoinResponse(true);
     }
 
-    public Object listAllGames(ListRequest lisReq) throws DataAccessException {
+    public Object listAllGames(ListRequest lisReq) {
         AuthData authData = dataAccess.getAuth(lisReq.authToken());
         if (authData == null) {
             return new ErrorResponse(401, "Error: unauthorized");

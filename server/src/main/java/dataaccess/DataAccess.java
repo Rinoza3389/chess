@@ -5,23 +5,23 @@ import java.util.ArrayList;
 
 public interface DataAccess {
 
-    void clear() throws DataAccessException;
+    void clear();
 
-    UserData getUser(String username) throws DataAccessException;
+    UserData getUser(String username);
 
-    String createUser(UserData user) throws DataAccessException;
+    String createUser(UserData user);
 
     String createAuth(String username) throws DataAccessException;
 
-    AuthData getAuth(String authToken) throws DataAccessException;
+    AuthData getAuth(String authToken);
 
-    void deleteAuth(String authToken) throws DataAccessException;
+    void deleteAuth(String authToken);
 
-    Integer createGame(String gameName) throws DataAccessException;
+    Integer createGame(String gameName);
 
-    GameData getGame(Integer gameID) throws DataAccessException;
+    GameData getGame(Integer gameID);
 
-    void updateGame(String playerColor, Integer gameID, String username) throws DataAccessException;
+    void updateGame(String playerColor, Integer gameID, String username);
 
-    ArrayList<GameData> listGames() throws DataAccessException;
+    ArrayList<GameData> listGames();
 }

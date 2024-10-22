@@ -37,8 +37,8 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessGame chessGame = (ChessGame) o;
         return Objects.equals(gameBoard, chessGame.gameBoard) && turnTeam == chessGame.turnTeam;
     }
@@ -73,7 +73,7 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         if (gameBoard.getPiece(startPosition) != null) {
-            Collection<ChessMove> returnMoves = new ArrayList<ChessMove>();
+            Collection<ChessMove> returnMoves = new ArrayList<>();
             ChessGame.TeamColor color = gameBoard.getPiece(startPosition).getTeamColor();
             ChessPiece movingPiece = gameBoard.getPiece(startPosition);
             Collection<ChessMove> possibleMoves = gameBoard.getPiece(startPosition).pieceMoves(gameBoard, startPosition);
@@ -104,16 +104,15 @@ public class ChessGame {
         ChessPosition moveStartPosition = move.getStartPosition();
         Collection<ChessMove> validMovesList = validMoves(moveStartPosition);
         if (validMovesList != null && validMovesList.contains(move) && getTeamTurn() == gameBoard.getPiece(moveStartPosition).getTeamColor()) {
+            ChessPiece movePiece;
             if (move.getPromotionPiece() != null) {
-                ChessPiece movePiece = new ChessPiece(gameBoard.getPiece(moveStartPosition).getTeamColor(), move.getPromotionPiece());
-                gameBoard.addPiece(moveStartPosition, null);
-                gameBoard.addPiece(move.getEndPosition(), movePiece);
+                movePiece = new ChessPiece(gameBoard.getPiece(moveStartPosition).getTeamColor(), move.getPromotionPiece());
             }
             else {
-                ChessPiece movePiece = new ChessPiece(gameBoard.getPiece(moveStartPosition).getTeamColor(), gameBoard.getPiece(moveStartPosition).getPieceType());
-                gameBoard.addPiece(moveStartPosition, null);
-                gameBoard.addPiece(move.getEndPosition(), movePiece);
+                movePiece = new ChessPiece(gameBoard.getPiece(moveStartPosition).getTeamColor(), gameBoard.getPiece(moveStartPosition).getPieceType());
             }
+            gameBoard.addPiece(moveStartPosition, null);
+            gameBoard.addPiece(move.getEndPosition(), movePiece);
             if (getTeamTurn() == TeamColor.BLACK) {
                 setTeamTurn(TeamColor.WHITE);
             }

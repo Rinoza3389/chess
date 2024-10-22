@@ -12,6 +12,7 @@ public class MemoryDataAccess implements DataAccess {
     final private HashMap<String, UserData> UserDataSet = new HashMap<>();
     final private HashMap<Integer, GameData> GameDataSet = new HashMap<>();
     final private HashMap<String, AuthData> AuthDataSet = new HashMap<>();
+    @SuppressWarnings("CanBeFinal")
     Random rand = new Random();
 
     public void clear() {
