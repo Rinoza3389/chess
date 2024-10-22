@@ -3,7 +3,6 @@ import dataaccess.*;
 import model.*;
 import server.*;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
 public class Services {
@@ -14,7 +13,7 @@ public class Services {
         this.dataAccess = new MemoryDataAccess();
     }
 
-    public Object clear()  throws DataAccessException {
+    public Object clear() {
         try {
             dataAccess.clear();
             return null;
@@ -43,16 +42,13 @@ public class Services {
     public Object loginUser(LoginRequest logReq) throws DataAccessException {
         UserData user = dataAccess.getUser(logReq.username());
         if (user == null) {
-            ErrorResponse nouser = new ErrorResponse(401, "Error: unauthorized");
-            return nouser;
+            return new ErrorResponse(401, "Error: unauthorized");
         }
         if (!user.password().equals(logReq.password())) {
-            ErrorResponse badpass = new ErrorResponse(401, "Error: unauthorized");
-            return badpass;
+            return new ErrorResponse(401, "Error: unauthorized");
         } else {
             String authToken = dataAccess.createAuth(user.username());
-            LoginResponse logResult = new LoginResponse(user.username(), authToken);
-            return logResult;
+            return new LoginResponse(user.username(), authToken);
         }
 
     }
@@ -60,8 +56,7 @@ public class Services {
     public Object logoutUser(LogoutRequest logReq) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(logReq.authToken());
         if (authData == null) {
-            ErrorResponse nouser = new ErrorResponse(401, "Error: unauthorized");
-            return nouser;
+            return new ErrorResponse(401, "Error: unauthorized");
         }
         dataAccess.deleteAuth(logReq.authToken());
         return null;
@@ -82,23 +77,19 @@ public class Services {
     public Object joinGame(JoinRequest joinReq) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(joinReq.authToken());
         if (authData == null) {
-            ErrorResponse nouser = new ErrorResponse(401, "Error: unauthorized");
-            return nouser;
+            return new ErrorResponse(401, "Error: unauthorized");
         }
         GameData gameData = dataAccess.getGame(joinReq.gameID());
         if (gameData == null) {
-            ErrorResponse nogame = new ErrorResponse(400, "Error: bad request");
-            return nogame;
+            return new ErrorResponse(400, "Error: bad request");
         }
         if (joinReq.playerColor().equals("WHITE")) {
             if (!(gameData.whiteUsername() == null)) {
-                ErrorResponse usertaken = new ErrorResponse(403, "Error: already taken");
-                return usertaken;
+                return new ErrorResponse(403, "Error: already taken");
             }
         } else {
             if (!(gameData.blackUsername() == null)) {
-                ErrorResponse usertaken = new ErrorResponse(403, "Error: already taken");
-                return usertaken;
+                return new ErrorResponse(403, "Error: already taken");
             }
         }
         try {
@@ -112,8 +103,7 @@ public class Services {
     public Object listAllGames(ListRequest lisReq) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(lisReq.authToken());
         if (authData == null) {
-            ErrorResponse nouser = new ErrorResponse(401, "Error: unauthorized");
-            return nouser;
+            return new ErrorResponse(401, "Error: unauthorized");
         }
         ArrayList<GameData> gamesList = dataAccess.listGames();
         return new ListResponse(gamesList);

@@ -44,11 +44,11 @@ public class MemoryDataAccess implements DataAccess {
         }
     }
 
-    public void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuth(String authToken) {
         AuthDataSet.remove(authToken);
     }
 
-    public Integer createGame(String gameName) throws DataAccessException {
+    public Integer createGame(String gameName) {
         Integer gameID = this.rand.nextInt(9999);
         ChessGame newGame = new ChessGame();
         GameData game = new GameData(gameID, null,null, gameName, newGame);
@@ -56,12 +56,11 @@ public class MemoryDataAccess implements DataAccess {
         return gameID;
     }
 
-    public GameData getGame(Integer gameID) throws DataAccessException {
-        GameData curGameData = GameDataSet.get(gameID);
-        return curGameData;
+    public GameData getGame(Integer gameID) {
+        return GameDataSet.get(gameID);
     }
 
-    public void updateGame(String playerColor, Integer gameID, String username) throws DataAccessException {
+    public void updateGame(String playerColor, Integer gameID, String username) {
         GameData curGameData = GameDataSet.get(gameID);
         GameData newGameData;
         if (playerColor.equals("WHITE")) {
@@ -72,8 +71,7 @@ public class MemoryDataAccess implements DataAccess {
         GameDataSet.put(gameID, newGameData);
     }
 
-    public ArrayList<GameData> listGames() throws DataAccessException {
-        ArrayList<GameData> listOfGames = new ArrayList<GameData>(GameDataSet.values());
-        return listOfGames;
+    public ArrayList<GameData> listGames() {
+        return new ArrayList<>(GameDataSet.values());
     }
 }
