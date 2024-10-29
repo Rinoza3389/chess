@@ -17,7 +17,15 @@ public class SqlDataAccess implements DataAccess{
 
     public void clear() throws DataAccessException {
         String[] statements = {"TRUNCATE GameData", "TRUNCATE UserData", "TRUNCATE AuthData"};
-
+        try (var conn = getConnection()) {
+            for (var statement : statements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s", e.getMessage()));
+        }
     };
 
     public UserData getUser(String username) {
