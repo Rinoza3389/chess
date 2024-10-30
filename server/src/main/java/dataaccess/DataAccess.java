@@ -6,11 +6,11 @@ import java.util.ArrayList;
 
 public interface DataAccess {
 
-    void clear() throws DataAccessException, SQLException;
+    void clear() throws DataAccessException;
 
-    UserData getUser(String username);
+    UserData getUser(String username) throws DataAccessException;
 
-    String createUser(UserData user);
+    String createUser(UserData user) throws DataAccessException;
 
     String createAuth(String username) throws DataAccessException;
 

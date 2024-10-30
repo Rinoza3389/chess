@@ -3,6 +3,7 @@ package dataaccess;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 import java.sql.*;
@@ -28,12 +29,35 @@ public class SqlDataAccess implements DataAccess{
         }
     };
 
-    public UserData getUser(String username) {
-        return null;
+    public UserData getUser(String username) throws DataAccessException {
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT username, password, email FROM UserData WHERE username=?")) {
+                preparedStatement.setString(1, username);
+                try (var rs = preparedStatement.executeQuery()) {
+                    UserData returnedUser = new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                    return returnedUser;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     };
 
-    public String createUser(UserData user) {
-        return null;
+    public String createUser(UserData user) throws DataAccessException {
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username, password, email) VALUES(?, ?, ?)")) {
+                preparedStatement.setString(1, user.username());
+                String hashedPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+                preparedStatement.setString(2, hashedPass);
+                preparedStatement.setString(3, user.email());
+
+                preparedStatement.executeUpdate();
+
+                return user.username();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     };
 
     public String createAuth(String username) throws DataAccessException {

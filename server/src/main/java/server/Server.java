@@ -2,10 +2,12 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import dataaccess.DataAccess;
 import spark.*;
 import dataaccess.DataAccessException;
 import service.*;
 
+import java.sql.SQLException;
 
 
 public class Server {
@@ -41,7 +43,7 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private Object clearHandler(Request req, Response res) {
+    private Object clearHandler(Request req, Response res) throws DataAccessException {
         var errorMaybe = mainService.clear();
         if (errorMaybe instanceof ErrorResponse){
             res.status(((ErrorResponse) errorMaybe).status());
@@ -60,15 +62,21 @@ public class Server {
             res.status(failedRequest.status());
             return new Gson().toJson(failedRequest);
         }
-        var regResponse = mainService.registerUser(regRequest);
-        if (regResponse instanceof RegisterResponse) {
-            res.status(200);
-            return new Gson().toJson(regResponse);
-        } else if (regResponse instanceof ErrorResponse) {
-            res.status(((ErrorResponse) regResponse).status());
-            return new Gson().toJson(regResponse);
-        } else {
-            ErrorResponse failedRequest = new ErrorResponse(400, "Error: bad request");
+        try {
+            var regResponse = mainService.registerUser(regRequest);
+            if (regResponse instanceof RegisterResponse) {
+                res.status(200);
+                return new Gson().toJson(regResponse);
+            } else if (regResponse instanceof ErrorResponse) {
+                res.status(((ErrorResponse) regResponse).status());
+                return new Gson().toJson(regResponse);
+            } else {
+                ErrorResponse failedRequest = new ErrorResponse(400, "Error: bad request");
+                res.status(failedRequest.status());
+                return new Gson().toJson(failedRequest);
+            }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, "Error: " + e.getMessage());
             res.status(failedRequest.status());
             return new Gson().toJson(failedRequest);
         }

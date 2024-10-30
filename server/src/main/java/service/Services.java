@@ -1,8 +1,10 @@
 package service;
 import dataaccess.*;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 import server.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Services {
@@ -10,15 +12,19 @@ public class Services {
     private final DataAccess dataAccess;
 
     public Services() {
-        this.dataAccess = new MemoryDataAccess();
+        try {
+            this.dataAccess = new SqlDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public Object clear() {
+    public Object clear() throws DataAccessException {
         dataAccess.clear();
         return null;
     }
 
-    public Object registerUser(RegisterRequest regRequest) {
+    public Object registerUser(RegisterRequest regRequest) throws DataAccessException {
         UserData user = new UserData(regRequest.username(), regRequest.password(), regRequest.email());
 
         if (dataAccess.getUser(user.username()) == null) {
@@ -40,7 +46,7 @@ public class Services {
         if (user == null) {
             return new ErrorResponse(401, "Error: unauthorized");
         }
-        if (!user.password().equals(logReq.password())) {
+        if (!BCrypt.checkpw(logReq.password(), user.password())) {
             return new ErrorResponse(401, "Error: unauthorized");
         } else {
             String authToken = dataAccess.createAuth(user.username());
