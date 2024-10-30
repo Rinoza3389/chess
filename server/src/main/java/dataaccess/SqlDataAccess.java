@@ -35,8 +35,10 @@ public class SqlDataAccess implements DataAccess{
             try (var preparedStatement = conn.prepareStatement("SELECT username, password, email FROM UserData WHERE username=?")) {
                 preparedStatement.setString(1, username);
                 try (var rs = preparedStatement.executeQuery()) {
-                    UserData returnedUser = new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
-                    return returnedUser;
+                    if (rs.next()) {
+                        UserData returnedUser = new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                        return returnedUser;
+                    } else { return null;}
                 }
             }
         } catch (SQLException e) {
@@ -46,15 +48,20 @@ public class SqlDataAccess implements DataAccess{
 
     public String createUser(UserData user) throws DataAccessException {
         try (var conn = getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username, password, email) VALUES(?, ?, ?)")) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username, password, email) VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 preparedStatement.setString(1, user.username());
                 String hashedPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
                 preparedStatement.setString(2, hashedPass);
                 preparedStatement.setString(3, user.email());
 
                 preparedStatement.executeUpdate();
-
-                return user.username();
+                var rs = preparedStatement.getGeneratedKeys();
+                if (rs != null) {
+                    return user.username();
+                }
+                else {
+                    return null;
+                }
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -63,14 +70,19 @@ public class SqlDataAccess implements DataAccess{
 
     public String createAuth(String username) throws DataAccessException {
         try (var conn = getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO AuthData (authToken, username) VALUES(?, ?)")) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO AuthData (authToken, username) VALUES(?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 String authToken = UUID.randomUUID().toString();
                 preparedStatement.setString(1, authToken);
                 preparedStatement.setString(2, username);
-
                 preparedStatement.executeUpdate();
 
-                return authToken;
+                var rs = preparedStatement.getGeneratedKeys();
+                if (rs != null) {
+                    return authToken;
+                }
+                else {
+                    return null;
+                }
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -82,7 +94,12 @@ public class SqlDataAccess implements DataAccess{
             try (var preparedStatement = conn.prepareStatement("SELECT authToken, username FROM AuthData WHERE authToken=?")) {
                 preparedStatement.setString(1, authToken);
                 try (var rs = preparedStatement.executeQuery()) {
-                    return new AuthData(rs.getString("authToken"), rs.getString("username"));
+                    if (rs.next()) {
+                        return new AuthData(rs.getString("authToken"), rs.getString("username"));
+                    }
+                    else {
+                        return null;
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -95,7 +112,7 @@ public class SqlDataAccess implements DataAccess{
             try (var preparedStatement = conn.prepareStatement("DELETE FROM AuthData WHERE authToken=?")) {
                 preparedStatement.setString(1, authToken);
                 try {
-                    var rs = preparedStatement.executeQuery();
+                    var rs = preparedStatement.executeUpdate();
                 } catch (SQLException e) {
                     throw new DataAccessException(e.getMessage());
                 }
@@ -128,8 +145,7 @@ public class SqlDataAccess implements DataAccess{
               `password` varchar(256) NOT NULL,
               `email` varchar(256) NOT NULL,
               PRIMARY KEY (`username`),
-              INDEX(type),
-              INDEX(name)
+              INDEX(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
             """
@@ -140,8 +156,8 @@ public class SqlDataAccess implements DataAccess{
               `gameName` varchar(256) NOT NULL,
               `game` TEXT DEFAULT NULL,
               PRIMARY KEY (`gameID`),
-              INDEX(type),
-              INDEX(name)
+              INDEX(gameID),
+              INDEX(gameName)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
             """
@@ -149,8 +165,7 @@ public class SqlDataAccess implements DataAccess{
               `authToken` varchar(256) NOT NULL,
               `username` varchar(256) NOT NULL,
               PRIMARY KEY (`authToken`),
-              INDEX(type),
-              INDEX(name)
+              INDEX(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };

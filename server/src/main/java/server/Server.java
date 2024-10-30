@@ -111,36 +111,48 @@ public class Server {
     }
 
     private Object logoutHandler(Request req, Response res){
-        var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
-        LogoutRequest logoutRequest = new LogoutRequest(authToken);
-        var logoutResponse = mainService.logoutUser(logoutRequest);
-        if (logoutResponse == null) {
-            res.status(200);
-            return "";
-        } else if (logoutResponse instanceof ErrorResponse) {
-            res.status(((ErrorResponse) logoutResponse).status());
-            return new Gson().toJson(logoutResponse);
-        } else {
-            ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+        try {
+            var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
+            LogoutRequest logoutRequest = new LogoutRequest(authToken);
+            var logoutResponse = mainService.logoutUser(logoutRequest);
+            if (logoutResponse == null) {
+                res.status(200);
+                return "";
+            } else if (logoutResponse instanceof ErrorResponse) {
+                res.status(((ErrorResponse) logoutResponse).status());
+                return new Gson().toJson(logoutResponse);
+            } else {
+                ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+                res.status(failedRequest.status());
+                return new Gson().toJson(failedRequest);
+            }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, "Error: " + e.getMessage());
             res.status(failedRequest.status());
             return new Gson().toJson(failedRequest);
         }
     }
 
     private Object createGameHandler(Request req, Response res) {
-        var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
-        var jsonObject = new Gson().fromJson(req.body(), JsonObject.class);
-        String gameName = jsonObject.get("gameName").getAsString();
-        CreateGameRequest cgRequest = new CreateGameRequest(authToken, gameName);
-        var cgResponse = mainService.createNewGame(cgRequest);
-        if (cgResponse instanceof CreateGameResponse) {
-            res.status(200);
-            return new Gson().toJson(cgResponse);
-        } else if (cgResponse instanceof ErrorResponse) {
-            res.status(((ErrorResponse) cgResponse).status());
-            return new Gson().toJson(cgResponse);
-        } else {
-            ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+        try {
+            var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
+            var jsonObject = new Gson().fromJson(req.body(), JsonObject.class);
+            String gameName = jsonObject.get("gameName").getAsString();
+            CreateGameRequest cgRequest = new CreateGameRequest(authToken, gameName);
+            var cgResponse = mainService.createNewGame(cgRequest);
+            if (cgResponse instanceof CreateGameResponse) {
+                res.status(200);
+                return new Gson().toJson(cgResponse);
+            } else if (cgResponse instanceof ErrorResponse) {
+                res.status(((ErrorResponse) cgResponse).status());
+                return new Gson().toJson(cgResponse);
+            } else {
+                ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+                res.status(failedRequest.status());
+                return new Gson().toJson(failedRequest);
+            }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, "Error: " + e.getMessage());
             res.status(failedRequest.status());
             return new Gson().toJson(failedRequest);
         }
@@ -166,38 +178,48 @@ public class Server {
             res.status(failedRequest.status());
             return new Gson().toJson(failedRequest);
         }
-        JoinRequest joinRequest = new JoinRequest(authToken, playerColor, gameID);
-        var joinResponse = mainService.joinGame(joinRequest);
-        if (joinResponse instanceof JoinResponse) {
-            res.status(200);
-            return "";
-        }
-        else if (joinResponse instanceof ErrorResponse){
-            res.status(((ErrorResponse) joinResponse).status());
-            return new Gson().toJson(joinResponse);
-        }
-        else {
-            ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+        try {
+            JoinRequest joinRequest = new JoinRequest(authToken, playerColor, gameID);
+            var joinResponse = mainService.joinGame(joinRequest);
+            if (joinResponse instanceof JoinResponse) {
+                res.status(200);
+                return "";
+            } else if (joinResponse instanceof ErrorResponse) {
+                res.status(((ErrorResponse) joinResponse).status());
+                return new Gson().toJson(joinResponse);
+            } else {
+                ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+                res.status(failedRequest.status());
+                return new Gson().toJson(failedRequest);
+            }
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, "Error: " + e.getMessage());
             res.status(failedRequest.status());
             return new Gson().toJson(failedRequest);
         }
     }
 
     private Object listHandler(Request req, Response res) {
-        var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
-        ListRequest lisReq = new ListRequest(authToken);
-        var lisRes = mainService.listAllGames(lisReq);
-        if (lisRes instanceof ListResponse) {
-            res.status(200);
-            return new Gson().toJson(lisRes);
+        try {
+            var authToken = new Gson().fromJson(req.headers("authorization"), String.class);
+            ListRequest lisReq = new ListRequest(authToken);
+            var lisRes = mainService.listAllGames(lisReq);
+            if (lisRes instanceof ListResponse) {
+                res.status(200);
+                return new Gson().toJson(lisRes);
+            }
+            if (lisRes instanceof ErrorResponse) {
+                res.status(((ErrorResponse) lisRes).status());
+                return new Gson().toJson(lisRes);
+            }
+            ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
+        } catch (DataAccessException e) {
+            ErrorResponse failedRequest = new ErrorResponse(500, "Error: " + e.getMessage());
+            res.status(failedRequest.status());
+            return new Gson().toJson(failedRequest);
         }
-        if (lisRes instanceof ErrorResponse) {
-            res.status(((ErrorResponse) lisRes).status());
-            return new Gson().toJson(lisRes);
-        }
-        ErrorResponse failedRequest = new ErrorResponse(500, "Error: issue getting correct Response");
-        res.status(failedRequest.status());
-        return new Gson().toJson(failedRequest);
     }
 }
 

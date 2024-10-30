@@ -25,6 +25,7 @@ public class ServiceTests {
     @BeforeEach
     public void setup() throws DataAccessException {
         mainService = new Services();
+        mainService.clear();
 
         //one user already logged in
         RegisterRequest logExistUser = new RegisterRequest(existingUser.getUsername(), existingUser.getPassword(), existingUser.getEmail());

@@ -55,7 +55,7 @@ public class Services {
 
     }
 
-    public Object logoutUser(LogoutRequest logReq) {
+    public Object logoutUser(LogoutRequest logReq) throws DataAccessException{
         AuthData authData = dataAccess.getAuth(logReq.authToken());
         if (authData == null) {
             return new ErrorResponse(401, "Error: unauthorized");
@@ -64,7 +64,7 @@ public class Services {
         return null;
     }
 
-    public Object createNewGame(CreateGameRequest cgReq) {
+    public Object createNewGame(CreateGameRequest cgReq) throws DataAccessException {
         if (cgReq.authToken() == null) {
             return new ErrorResponse(400, "Error: bad request");
         }
@@ -76,7 +76,7 @@ public class Services {
         return new CreateGameResponse(gameID);
     }
 
-    public Object joinGame(JoinRequest joinReq) {
+    public Object joinGame(JoinRequest joinReq) throws DataAccessException{
         AuthData authData = dataAccess.getAuth(joinReq.authToken());
         if (authData == null) {
             return new ErrorResponse(401, "Error: unauthorized");
@@ -98,7 +98,7 @@ public class Services {
         return new JoinResponse(true);
     }
 
-    public Object listAllGames(ListRequest lisReq) {
+    public Object listAllGames(ListRequest lisReq) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(lisReq.authToken());
         if (authData == null) {
             return new ErrorResponse(401, "Error: unauthorized");
