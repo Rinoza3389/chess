@@ -7,6 +7,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 import java.sql.*;
+import java.util.UUID;
 
 import static dataaccess.DatabaseManager.*;
 
@@ -61,15 +62,47 @@ public class SqlDataAccess implements DataAccess{
     };
 
     public String createAuth(String username) throws DataAccessException {
-        return null;
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO AuthData (authToken, username) VALUES(?, ?)")) {
+                String authToken = UUID.randomUUID().toString();
+                preparedStatement.setString(1, authToken);
+                preparedStatement.setString(2, username);
+
+                preparedStatement.executeUpdate();
+
+                return authToken;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     };
 
-    public AuthData getAuth(String authToken) {
-      return null;
+    public AuthData getAuth(String authToken) throws DataAccessException{
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT authToken, username FROM AuthData WHERE authToken=?")) {
+                preparedStatement.setString(1, authToken);
+                try (var rs = preparedStatement.executeQuery()) {
+                    return new AuthData(rs.getString("authToken"), rs.getString("username"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     };
 
-    public void deleteAuth(String authToken) {
-
+    public void deleteAuth(String authToken) throws DataAccessException {
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("DELETE FROM AuthData WHERE authToken=?")) {
+                preparedStatement.setString(1, authToken);
+                try {
+                    var rs = preparedStatement.executeQuery();
+                } catch (SQLException e) {
+                    throw new DataAccessException(e.getMessage());
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     };
 
     public Integer createGame(String gameName) {
