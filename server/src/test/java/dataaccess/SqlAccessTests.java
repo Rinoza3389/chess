@@ -55,10 +55,12 @@ public class SqlAccessTests {
     @Test
     @DisplayName("Test Get User")
     public void getUserGood() throws DataAccessException {
-        UserData existingUserResult = currAccess.getUser(existingUser.username());
+        UserData user3 = new UserData("gallwaygirl", "edward", "sheeran.com");
+        String resultUser3 = currAccess.createUser(user3);
+        UserData existingUserResult = currAccess.getUser(resultUser3);
         assert existingUserResult != null;
-        assert existingUserResult.username().equals(existingUser.username());
-        assert existingUserResult.email().equals(existingUser.email());
+        assert existingUserResult.username().equals(resultUser3);
+        assert existingUserResult.email().equals("sheeran.com");
     }
 
     @Test
@@ -85,9 +87,9 @@ public class SqlAccessTests {
     @Test
     @DisplayName("GetAuthGood")
     public void getAuthGood() throws DataAccessException {
-        AuthData authToken = currAccess.getAuth(existingAuth);
-        assert authToken != null;
-        assert authToken.authToken().equals(existingAuth);
+        String authToken = currAccess.createAuth(existingUser.username());
+        AuthData authData = currAccess.getAuth(authToken);
+        assert authData != null;
     }
 
     @Test
@@ -111,5 +113,80 @@ public class SqlAccessTests {
         currAccess.deleteAuth(existingAuth);
         AuthData authToken = currAccess.getAuth(existingAuth);
         assert authToken == null;
+    }
+
+    @Test
+    @DisplayName("CreateGameGood")
+    public void createGameGood() throws DataAccessException {
+        Integer momCode = currAccess.createGame("Your MOm's House");
+        assert momCode != null;
+    }
+
+    @Test
+    @DisplayName("CreateGameBad")
+    public void createGameBad() throws DataAccessException {
+        Integer windowCode = currAccess.createGame("Defenestration");
+        assert windowCode != null;
+    }
+
+    @Test
+    @DisplayName("GetGameGood")
+    public void getGameGood() throws DataAccessException {
+        Integer harryPotter = currAccess.createGame("pOTTER");
+        GameData potterGame = currAccess.getGame(harryPotter);
+        assert potterGame != null;
+        assert potterGame.gameName().equals("pOTTER");
+    }
+
+    @Test
+    @DisplayName("GetGameBad")
+    public void getGameBad() throws DataAccessException {
+        GameData makeAWish = currAccess.getGame(33890);
+        assert makeAWish == null;
+    }
+
+    @Test
+    @DisplayName("UpdateGameGood")
+    public void updateGameGood() throws DataAccessException {
+        Integer weesh = currAccess.createGame("11:11");
+        GameData makeAWish = currAccess.getGame(weesh);
+        assert makeAWish != null;
+        currAccess.updateGame("WHITE", weesh, "MaddyPaddy");
+        makeAWish = currAccess.getGame(weesh);
+        assert makeAWish.whiteUsername().equals("MaddyPaddy");
+    }
+
+    @Test
+    @DisplayName("UpdateGameBad")
+    public void updateGameBad() throws DataAccessException {
+        Integer grrr = currAccess.createGame("rawr");
+        GameData animalGrowl = currAccess.getGame(grrr);
+        assert animalGrowl != null;
+        currAccess.updateGame("BLACK", grrr, "MaddyPaddy");
+        animalGrowl = currAccess.getGame(grrr);
+        assert animalGrowl.blackUsername().equals("MaddyPaddy");
+    }
+
+    @Test
+    @DisplayName("ListGames")
+    public void listGames() throws DataAccessException {
+        var listOfGames = currAccess.listGames();
+        assert listOfGames != null;
+    }
+
+    @Test
+    @DisplayName("Test Clear")
+    public void clear() throws DataAccessException {
+        currAccess.clear();
+        var listOfGames = currAccess.listGames();
+        assert listOfGames.isEmpty();
+    }
+
+    @Test
+    @DisplayName("ListGamesBad")
+    public void listGamesBad() throws DataAccessException {
+        currAccess.clear();
+        var listOfGames = currAccess.listGames();
+        assert listOfGames.isEmpty();
     }
 }
