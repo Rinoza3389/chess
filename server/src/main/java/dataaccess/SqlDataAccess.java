@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -122,20 +124,95 @@ public class SqlDataAccess implements DataAccess{
         }
     };
 
-    public Integer createGame(String gameName) {
-        return null;
+    public Integer createGame(String gameName) throws DataAccessException {
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO GameData (whiteUsername, blackUsername, gameName, game) VALUES(?, ? , ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+                ChessGame newGame = new ChessGame();
+                var jsonGame = new Gson().toJson(newGame);
+                preparedStatement.setNull(1, Types.NULL);
+                preparedStatement.setNull(2, Types.NULL);
+                preparedStatement.setString(3, gameName);
+                preparedStatement.setString(4, jsonGame);
+                var gameID = preparedStatement.executeUpdate();
+
+                var rs = preparedStatement.getGeneratedKeys();
+                if (rs != null) {
+                    return gameID;
+                }
+                else {
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     };
 
-    public GameData getGame(Integer gameID) {
-        return null;
+    public GameData getGame(Integer gameID) throws DataAccessException{
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData WHERE gameID=?")) {
+                preparedStatement.setInt(1, gameID);
+                try (var rs = preparedStatement.executeQuery()) {
+                    if (rs.next()) {
+                        var gameJson = rs.getString("game");
+                        ChessGame currGame = new Gson().fromJson(gameJson, ChessGame.class);
+                        return new GameData(gameID, rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), currGame);
+                    }
+                    else {
+                        return null;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     };
 
-    public void updateGame(String playerColor, Integer gameID, String username) {
-
+    public void updateGame(String playerColor, Integer gameID, String username) throws DataAccessException {
+        try (var conn = getConnection()) {
+            if (playerColor.equals("WHITE")) {
+                try (var preparedStatement = conn.prepareStatement("UPDATE GameData SET whiteUsername=? WHERE gameID=?")) {
+                    preparedStatement.setString(1, username);
+                    preparedStatement.setInt(2, gameID);
+                    try {
+                        var rs = preparedStatement.executeUpdate();
+                    } catch (SQLException e) {
+                        throw new DataAccessException(e.getMessage());
+                    }
+                }
+            } else {
+                try (var preparedStatement = conn.prepareStatement("UPDATE GameData SET blackUsername=? WHERE gameID=?")) {
+                    preparedStatement.setString(1, username);
+                    preparedStatement.setInt(2, gameID);
+                    try {
+                        var rs = preparedStatement.executeUpdate();
+                    } catch (SQLException e) {
+                        throw new DataAccessException(e.getMessage());
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     };
 
-    public ArrayList<GameData> listGames() {
-        return null;
+    public ArrayList<GameData> listGames() throws DataAccessException {
+        var result = new ArrayList<GameData>();
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData")) {
+                try (var rs = preparedStatement.executeQuery()) {
+                    while (rs.next()) {
+                        var gameJson = rs.getString("game");
+                        ChessGame currGame = new Gson().fromJson(gameJson, ChessGame.class);
+                        GameData currData = new GameData(rs.getInt("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), currGame);
+                        result.add(currData);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+        return result;
     };
 
     private final String[] createStatements = {
