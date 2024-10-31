@@ -116,7 +116,7 @@ public class SqlDataAccess implements DataAccess{
             try (var preparedStatement = conn.prepareStatement("DELETE FROM AuthData WHERE authToken=?")) {
                 preparedStatement.setString(1, authToken);
                 try {
-                    var rs = preparedStatement.executeUpdate();
+                    preparedStatement.executeUpdate();
                 } catch (SQLException e) {
                     throw new DataAccessException(e.getMessage());
                 }
@@ -130,7 +130,7 @@ public class SqlDataAccess implements DataAccess{
         try (var conn = getConnection()) {
             try (var preparedStatement = conn.prepareStatement("INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ? , ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 ChessGame newGame = new ChessGame();
-                Integer gameID = this.rand.nextInt(9999);
+                int gameID = this.rand.nextInt(9999);
                 var jsonGame = new Gson().toJson(newGame);
                 preparedStatement.setInt(1, gameID);
                 preparedStatement.setNull(2, Types.NULL);
@@ -179,7 +179,7 @@ public class SqlDataAccess implements DataAccess{
                     preparedStatement.setString(1, username);
                     preparedStatement.setInt(2, gameID);
                     try {
-                        var rs = preparedStatement.executeUpdate();
+                        preparedStatement.executeUpdate();
                     } catch (SQLException e) {
                         throw new DataAccessException(e.getMessage());
                     }
@@ -189,7 +189,7 @@ public class SqlDataAccess implements DataAccess{
                     preparedStatement.setString(1, username);
                     preparedStatement.setInt(2, gameID);
                     try {
-                        var rs = preparedStatement.executeUpdate();
+                        preparedStatement.executeUpdate();
                     } catch (SQLException e) {
                         throw new DataAccessException(e.getMessage());
                     }
