@@ -54,7 +54,8 @@ public class SqlDataAccess implements DataAccess{
     public String createUser(UserData user) throws DataAccessException {
         try (var conn = getConnection()) {
             try {
-                var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username, password, email) VALUES(?, ?, ?)",RETURN_GENERATED_KEYS);
+                var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username, password, email) VALUES(?, ?, ?)",
+                        RETURN_GENERATED_KEYS);
                 preparedStatement.setString(1, user.username());
                 String hashedPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
                 preparedStatement.setString(2, hashedPass);
@@ -136,7 +137,8 @@ public class SqlDataAccess implements DataAccess{
     public Integer createGame(String gameName) throws DataAccessException {
         try (var conn = getConnection()) {
             try {
-                var preparedStatement = conn.prepareStatement("INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ? , ?, ?)", RETURN_GENERATED_KEYS);
+                var preparedStatement = conn.prepareStatement("INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES(?, ?, ? , ?, ?)", RETURN_GENERATED_KEYS);
                 ChessGame newGame = new ChessGame();
                 int gameID = this.rand.nextInt(9999);
                 var jsonGame = new Gson().toJson(newGame);
@@ -165,7 +167,8 @@ public class SqlDataAccess implements DataAccess{
     public GameData getGame(Integer gameID) throws DataAccessException{
         try (var conn = getConnection()) {
             try {
-                var preparedStatement = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData WHERE gameID=?");
+                var preparedStatement = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game " +
+                        "FROM GameData WHERE gameID=?");
                 preparedStatement.setInt(1, gameID);
                 try (var rs = preparedStatement.executeQuery()) {
                     if (rs.next()) {
