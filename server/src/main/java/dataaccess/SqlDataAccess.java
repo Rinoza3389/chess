@@ -52,7 +52,8 @@ public class SqlDataAccess implements DataAccess{
 
     public String createUser(UserData user) throws DataAccessException {
         try (var conn = getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username, password, email) VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            try {
+                var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username, password, email) VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 preparedStatement.setString(1, user.username());
                 String hashedPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
                 preparedStatement.setString(2, hashedPass);
@@ -66,6 +67,8 @@ public class SqlDataAccess implements DataAccess{
                 else {
                     return null;
                 }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -74,7 +77,8 @@ public class SqlDataAccess implements DataAccess{
 
     public String createAuth(String username) throws DataAccessException {
         try (var conn = getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO AuthData (authToken, username) VALUES(?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            try {
+                var preparedStatement = conn.prepareStatement("INSERT INTO AuthData (authToken, username) VALUES(?, ?)", Statement.RETURN_GENERATED_KEYS);
                 String authToken = UUID.randomUUID().toString();
                 preparedStatement.setString(1, authToken);
                 preparedStatement.setString(2, username);
@@ -87,6 +91,8 @@ public class SqlDataAccess implements DataAccess{
                 else {
                     return null;
                 }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -128,7 +134,8 @@ public class SqlDataAccess implements DataAccess{
 
     public Integer createGame(String gameName) throws DataAccessException {
         try (var conn = getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ? , ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            try {
+                var preparedStatement = conn.prepareStatement("INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ? , ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 ChessGame newGame = new ChessGame();
                 int gameID = this.rand.nextInt(9999);
                 var jsonGame = new Gson().toJson(newGame);
@@ -146,6 +153,8 @@ public class SqlDataAccess implements DataAccess{
                 else {
                     return null;
                 }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -154,7 +163,8 @@ public class SqlDataAccess implements DataAccess{
 
     public GameData getGame(Integer gameID) throws DataAccessException{
         try (var conn = getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData WHERE gameID=?")) {
+            try {
+                var preparedStatement = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData WHERE gameID=?");
                 preparedStatement.setInt(1, gameID);
                 try (var rs = preparedStatement.executeQuery()) {
                     if (rs.next()) {
@@ -166,6 +176,8 @@ public class SqlDataAccess implements DataAccess{
                         return null;
                     }
                 }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -174,26 +186,22 @@ public class SqlDataAccess implements DataAccess{
 
     public void updateGame(String playerColor, Integer gameID, String username) throws DataAccessException {
         try (var conn = getConnection()) {
-            if (playerColor.equals("WHITE")) {
-                try (var preparedStatement = conn.prepareStatement("UPDATE GameData SET whiteUsername=? WHERE gameID=?")) {
-                    preparedStatement.setString(1, username);
-                    preparedStatement.setInt(2, gameID);
-                    try {
-                        preparedStatement.executeUpdate();
-                    } catch (SQLException e) {
-                        throw new DataAccessException(e.getMessage());
-                    }
+            try {
+                PreparedStatement preparedStatement;
+                if (playerColor.equals("WHITE")) {
+                    preparedStatement = conn.prepareStatement("UPDATE GameData SET whiteUsername=? WHERE gameID=?");
+                } else {
+                    preparedStatement = conn.prepareStatement("UPDATE GameData SET blackUsername=? WHERE gameID=?");
                 }
-            } else {
-                try (var preparedStatement = conn.prepareStatement("UPDATE GameData SET blackUsername=? WHERE gameID=?")) {
-                    preparedStatement.setString(1, username);
-                    preparedStatement.setInt(2, gameID);
-                    try {
-                        preparedStatement.executeUpdate();
-                    } catch (SQLException e) {
-                        throw new DataAccessException(e.getMessage());
-                    }
+                preparedStatement.setString(1, username);
+                preparedStatement.setInt(2, gameID);
+                try {
+                    preparedStatement.executeUpdate();
+                } catch (SQLException e) {
+                    throw new DataAccessException(e.getMessage());
                 }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -208,7 +216,11 @@ public class SqlDataAccess implements DataAccess{
                     while (rs.next()) {
                         var gameJson = rs.getString("game");
                         ChessGame currGame = new Gson().fromJson(gameJson, ChessGame.class);
-                        GameData currData = new GameData(rs.getInt("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), currGame);
+                        int currGameId = rs.getInt("gameID");
+                        String currWhiteUser = rs.getString("whiteUsername");
+                        String currBlackUser = rs.getString("blackUsername");
+                        String currGameName = rs.getString("gameName");
+                        GameData currData = new GameData(currGameId, currWhiteUser, currBlackUser, currGameName, currGame);
                         result.add(currData);
                     }
                 }
