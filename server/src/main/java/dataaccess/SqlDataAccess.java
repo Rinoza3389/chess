@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.Random;
 
 import static dataaccess.DatabaseManager.*;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SqlDataAccess implements DataAccess{
 
@@ -53,7 +54,7 @@ public class SqlDataAccess implements DataAccess{
     public String createUser(UserData user) throws DataAccessException {
         try (var conn = getConnection()) {
             try {
-                var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username, password, email) VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username, password, email) VALUES(?, ?, ?)",RETURN_GENERATED_KEYS);
                 preparedStatement.setString(1, user.username());
                 String hashedPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
                 preparedStatement.setString(2, hashedPass);
@@ -78,7 +79,7 @@ public class SqlDataAccess implements DataAccess{
     public String createAuth(String username) throws DataAccessException {
         try (var conn = getConnection()) {
             try {
-                var preparedStatement = conn.prepareStatement("INSERT INTO AuthData (authToken, username) VALUES(?, ?)", Statement.RETURN_GENERATED_KEYS);
+                var preparedStatement = conn.prepareStatement("INSERT INTO AuthData (authToken, username) VALUES(?, ?)", RETURN_GENERATED_KEYS);
                 String authToken = UUID.randomUUID().toString();
                 preparedStatement.setString(1, authToken);
                 preparedStatement.setString(2, username);
@@ -135,7 +136,7 @@ public class SqlDataAccess implements DataAccess{
     public Integer createGame(String gameName) throws DataAccessException {
         try (var conn = getConnection()) {
             try {
-                var preparedStatement = conn.prepareStatement("INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ? , ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                var preparedStatement = conn.prepareStatement("INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ? , ?, ?)", RETURN_GENERATED_KEYS);
                 ChessGame newGame = new ChessGame();
                 int gameID = this.rand.nextInt(9999);
                 var jsonGame = new Gson().toJson(newGame);
