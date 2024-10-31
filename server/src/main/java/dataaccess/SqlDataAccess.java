@@ -33,7 +33,7 @@ public class SqlDataAccess implements DataAccess{
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to update database: %s", e.getMessage()));
         }
-    };
+    }
 
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = getConnection()) {
@@ -41,15 +41,14 @@ public class SqlDataAccess implements DataAccess{
                 preparedStatement.setString(1, username);
                 try (var rs = preparedStatement.executeQuery()) {
                     if (rs.next()) {
-                        UserData returnedUser = new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
-                        return returnedUser;
+                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
                     } else { return null;}
                 }
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    };
+    }
 
     public String createUser(UserData user) throws DataAccessException {
         try (var conn = getConnection()) {
@@ -71,7 +70,7 @@ public class SqlDataAccess implements DataAccess{
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    };
+    }
 
     public String createAuth(String username) throws DataAccessException {
         try (var conn = getConnection()) {
@@ -92,7 +91,7 @@ public class SqlDataAccess implements DataAccess{
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    };
+    }
 
     public AuthData getAuth(String authToken) throws DataAccessException{
         try (var conn = getConnection()) {
@@ -110,7 +109,7 @@ public class SqlDataAccess implements DataAccess{
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    };
+    }
 
     public void deleteAuth(String authToken) throws DataAccessException {
         try (var conn = getConnection()) {
@@ -125,7 +124,7 @@ public class SqlDataAccess implements DataAccess{
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    };
+    }
 
     public Integer createGame(String gameName) throws DataAccessException {
         try (var conn = getConnection()) {
@@ -151,7 +150,7 @@ public class SqlDataAccess implements DataAccess{
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    };
+    }
 
     public GameData getGame(Integer gameID) throws DataAccessException{
         try (var conn = getConnection()) {
@@ -171,7 +170,7 @@ public class SqlDataAccess implements DataAccess{
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    };
+    }
 
     public void updateGame(String playerColor, Integer gameID, String username) throws DataAccessException {
         try (var conn = getConnection()) {
@@ -199,7 +198,7 @@ public class SqlDataAccess implements DataAccess{
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    };
+    }
 
     public ArrayList<GameData> listGames() throws DataAccessException {
         var result = new ArrayList<GameData>();
@@ -218,7 +217,7 @@ public class SqlDataAccess implements DataAccess{
             throw new DataAccessException(e.getMessage());
         }
         return result;
-    };
+    }
 
     private final String[] createStatements = {
             """
