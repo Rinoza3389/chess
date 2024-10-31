@@ -7,8 +7,11 @@ public class SqlAccessTests {
 
     private static SqlDataAccess currAccess;
 
-    @BeforeEach
-    public void setup() throws DataAccessException {
+    @BeforeAll
+    public static void setup() throws DataAccessException {
         currAccess = new SqlDataAccess();
     }
+
+    @Test
+    @DisplayName("Test Add")
 }

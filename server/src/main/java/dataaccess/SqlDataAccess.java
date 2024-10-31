@@ -10,10 +10,13 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.ArrayList;
 import java.sql.*;
 import java.util.UUID;
+import java.util.Random;
 
 import static dataaccess.DatabaseManager.*;
 
 public class SqlDataAccess implements DataAccess{
+
+    Random rand = new Random();
 
     public SqlDataAccess() throws DataAccessException {
         configureDatabase();
@@ -126,14 +129,16 @@ public class SqlDataAccess implements DataAccess{
 
     public Integer createGame(String gameName) throws DataAccessException {
         try (var conn = getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO GameData (whiteUsername, blackUsername, gameName, game) VALUES(?, ? , ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ? , ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 ChessGame newGame = new ChessGame();
+                Integer gameID = this.rand.nextInt(9999);
                 var jsonGame = new Gson().toJson(newGame);
-                preparedStatement.setNull(1, Types.NULL);
+                preparedStatement.setInt(1, gameID);
                 preparedStatement.setNull(2, Types.NULL);
-                preparedStatement.setString(3, gameName);
-                preparedStatement.setString(4, jsonGame);
-                var gameID = preparedStatement.executeUpdate();
+                preparedStatement.setNull(3, Types.NULL);
+                preparedStatement.setString(4, gameName);
+                preparedStatement.setString(5, jsonGame);
+                preparedStatement.executeUpdate();
 
                 var rs = preparedStatement.getGeneratedKeys();
                 if (rs != null) {
@@ -227,7 +232,7 @@ public class SqlDataAccess implements DataAccess{
             """,
             """
             CREATE TABLE IF NOT EXISTS  GameData (
-              `gameID` int NOT NULL AUTO_INCREMENT,
+              `gameID` int NOT NULL,
               `whiteUsername` varchar(256) DEFAULT NULL,
               `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,
