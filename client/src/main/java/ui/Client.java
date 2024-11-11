@@ -1,7 +1,6 @@
 package ui;
 
-import server.RegisterRequest;
-import server.RegisterResponse;
+import server.*;
 
 import java.util.Scanner;
 
@@ -50,8 +49,10 @@ public class Client {
                     System.out.println("Password: ");
                     String pass = scanner.nextLine();
 
-                    System.out.printf("User: %s, Pass: %s\n\n", user, pass);
+                    LoginRequest logReq = new LoginRequest(user, pass);
+
                 } else if (selectedOption == 3) {
+                    System.out.println("Goodbye!!");
                     break;
                 } else if (selectedOption == 4) {
                     System.out.println("Register: Allows you to create an account and start playing! Will require a username, email, and password.\n" +
