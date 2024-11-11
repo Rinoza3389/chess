@@ -18,6 +18,10 @@ public final class ErrorResponse {
         return status;
     }
 
+    public String message() {
+        return message;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {return true;}
