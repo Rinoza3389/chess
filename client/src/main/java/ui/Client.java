@@ -50,7 +50,15 @@ public class Client {
                     String pass = scanner.nextLine();
 
                     LoginRequest logReq = new LoginRequest(user, pass);
-
+                    var output = facade.loginFacade(logReq);
+                    if (output instanceof LoginResponse) {
+                        System.out.println("Login successful!!");
+                        currAuthToken = ((LoginResponse) output).authToken();
+                    } else if (output instanceof String) {
+                        System.out.println(output);
+                    } else {
+                        System.out.println("Error occurred but nothing was returned.");
+                    }
                 } else if (selectedOption == 3) {
                     System.out.println("Goodbye!!");
                     break;

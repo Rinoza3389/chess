@@ -8,7 +8,7 @@ import server.*;
 import com.google.gson.Gson;
 
 public class ClientCommunicator {
-    public Object doPost(String urlString, RegisterRequest regReq) throws IOException {
+    public Object doPost(String urlString, Object requestObj) throws IOException {
         URL url = new URL(urlString);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -19,7 +19,15 @@ public class ClientCommunicator {
 
         connection.connect();
 
-        var body = Map.of("username", regReq.username(), "email", regReq.email(), "password", regReq.password());
+        Object body = null;
+        if (requestObj instanceof RegisterRequest) {
+            body = Map.of("username", ((RegisterRequest) requestObj).username(),
+                    "email", ((RegisterRequest) requestObj).email(), "password", ((RegisterRequest) requestObj).password());
+        }
+        else if (requestObj instanceof LoginRequest) {
+            body = Map.of("username", ((LoginRequest) requestObj).username(),
+                    "password", ((LoginRequest) requestObj).password());
+        }
 
         try (OutputStream requestBody = connection.getOutputStream();) {
             // Write request body to OutputStream ...
@@ -30,7 +38,12 @@ public class ClientCommunicator {
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             try (InputStream responseBody = connection.getInputStream()) {
                 InputStreamReader inputStreamReader = new InputStreamReader(responseBody);
-                return new Gson().fromJson(inputStreamReader, RegisterResponse.class);
+                if (requestObj instanceof RegisterRequest) {
+                    return new Gson().fromJson(inputStreamReader, RegisterResponse.class);
+                }
+                else if (requestObj instanceof LoginRequest) {
+                    return new Gson().fromJson(inputStreamReader, LoginResponse.class);
+                }
             }
             // Read response body from InputStream ...
         }

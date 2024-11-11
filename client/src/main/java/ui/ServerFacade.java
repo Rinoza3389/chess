@@ -23,6 +23,26 @@ public class ServerFacade {
         catch (IOException e) {
             System.out.print(e.getMessage());
         }
-        return "urmom";
+        return null;
+    }
+
+    public Object loginFacade(LoginRequest logReq) {
+        ClientCommunicator cliCom = new ClientCommunicator();
+        try {
+            var logRes = cliCom.doPost("http://localhost:8080/session", logReq);
+            if (logRes instanceof LoginResponse) {
+                return logRes;
+            }
+            else if (logRes instanceof ErrorResponse) {
+                return ((ErrorResponse) logRes).message();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            System.out.print(e.getMessage());
+        }
+        return null;
     }
 }
