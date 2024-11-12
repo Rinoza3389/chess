@@ -45,4 +45,20 @@ public class ServerFacade {
         }
         return null;
     }
+
+    public Object logoutFacade(LogoutRequest logReq) {
+        ClientCommunicator cliCom = new ClientCommunicator();
+        try {
+            var logRes = cliCom.doDelete("http://localhost:8080/session", logReq);
+            if (logRes instanceof ErrorResponse) {
+                return ((ErrorResponse) logRes).message();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            return e.getMessage();
+        }
+    }
 }

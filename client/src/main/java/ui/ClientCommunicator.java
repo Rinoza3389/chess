@@ -65,6 +65,42 @@ public class ClientCommunicator {
         return null;
     }
 
+    public Object doDelete(String urlString, LogoutRequest logReq) throws IOException{
+        URL url = new URL(urlString);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("DELETE");
+
+        connection.addRequestProperty("authorization", logReq.authToken());
+
+        connection.connect();
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            try (InputStream responseBody = connection.getInputStream()) {
+                return null;
+            }
+            // Read response body from InputStream ...
+        }
+        else {
+            // SERVER RETURNED AN HTTP ERROR
+            InputStream responseBody = connection.getErrorStream();
+            // Read and process error response body from InputStream ...
+            try {
+                if (responseBody != null) {
+                    String errorResponse = readStream(responseBody);
+                    return new Gson().fromJson(errorResponse, ErrorResponse.class);
+                } else {
+                    System.out.println("No error response body.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ErrorResponse(404, "Connection Failure");
+    }
+
     private static String readStream(InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         StringBuilder responseBuilder = new StringBuilder();
