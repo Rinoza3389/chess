@@ -1,4 +1,4 @@
-package ui.reqRes;
+package ui.reqres;
 
 import model.GameData;
 

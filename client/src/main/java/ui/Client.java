@@ -1,7 +1,7 @@
 package ui;
 
 import model.GameData;
-import ui.reqRes.*;
+import ui.reqres.*;
 
 import java.util.HashMap;
 import java.util.Scanner;
@@ -69,7 +69,8 @@ public class Client {
                 }
                 else if (selectedOption == 5) {
                     System.out.println("Play Game: Allows you to join an existing game based on specified game number and color choice.\n" +
-                            "Create Game: Allows you to create a new game with a name of your choosing. NOTE: You will not automatically join the new game.\n" +
+                            "Create Game: Allows you to create a new game with a name of your choosing. " +
+                            "NOTE: You will not automatically join the new game.\n" +
                             "Observe Game: Allows you to observe an existing game based on a specified game number.\n" +
                             "List Games: Lists all the games that currently exist.\n" +
                             "Help: Pulls up this menu with information about each option.\n" +

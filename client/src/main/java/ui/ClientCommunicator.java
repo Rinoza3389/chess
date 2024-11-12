@@ -4,30 +4,14 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import ui.reqRes.*;
+import ui.reqres.*;
 import com.google.gson.Gson;
 
 public class ClientCommunicator {
     public Object doPost(String urlString, Object requestObj) throws IOException {
-        URL url = new URL(urlString);
+        HttpURLConnection connection = setUpConnection(urlString, requestObj, "POST");
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setReadTimeout(5000);
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-
-        if (requestObj instanceof CreateGameRequest) {
-            connection.addRequestProperty("authorization", ((CreateGameRequest) requestObj).authToken());
-        }
-
-        connection.connect();
-
-        try (OutputStream requestBody = connection.getOutputStream()) {
-            // Write request body to OutputStream ...
-            var jsonBody = new Gson().toJson(requestObj);
-            requestBody.write(jsonBody.getBytes());
-        }
+        writeBodyOut(connection, requestObj);
 
 
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -46,35 +30,13 @@ public class ClientCommunicator {
             // Read response body from InputStream ...
         }
         else {
-            // SERVER RETURNED AN HTTP ERROR
-            InputStream responseBody = connection.getErrorStream();
-            // Read and process error response body from InputStream ...
-            try {
-                if (responseBody != null) {
-                    String errorResponse = readStream(responseBody);
-                    return new Gson().fromJson(errorResponse, ErrorResponse.class);
-                } else {
-                    System.out.println("No error response body.");
-                }
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
+            return dealWithError(connection);
         }
         return null;
     }
 
     public Object doDelete(String urlString, Object logReq) throws IOException{
-        URL url = new URL(urlString);
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setReadTimeout(5000);
-        connection.setRequestMethod("DELETE");
-
-        if (logReq instanceof LogoutRequest) {
-        connection.addRequestProperty("authorization", ((LogoutRequest) logReq).authToken()); }
-
-        connection.connect();
+        HttpURLConnection connection = setUpConnection(urlString, logReq, "DELETE");
 
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             try (InputStream responseBody = connection.getInputStream()) {
@@ -83,21 +45,8 @@ public class ClientCommunicator {
             // Read response body from InputStream ...
         }
         else {
-            // SERVER RETURNED AN HTTP ERROR
-            InputStream responseBody = connection.getErrorStream();
-            // Read and process error response body from InputStream ...
-            try {
-                if (responseBody != null) {
-                    String errorResponse = readStream(responseBody);
-                    return new Gson().fromJson(errorResponse, ErrorResponse.class);
-                } else {
-                    System.out.println("No error response body.");
-                }
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
+            return dealWithError(connection);
         }
-        return new ErrorResponse(404, "Connection Failure");
     }
 
     private static String readStream(InputStream inputStream) throws IOException {
@@ -113,16 +62,7 @@ public class ClientCommunicator {
     }
 
     public Object doGet(String urlString, ListRequest listReq) throws IOException {
-        URL url = new URL(urlString);
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setReadTimeout(5000);
-        connection.setRequestMethod("GET");
-
-        connection.addRequestProperty("authorization", listReq.authToken());
-
-        connection.connect();
+        HttpURLConnection connection = setUpConnection(urlString, listReq, "GET");
 
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             try (InputStream responseBody = connection.getInputStream()) {
@@ -132,41 +72,14 @@ public class ClientCommunicator {
             }
         }
         else {
-            // SERVER RETURNED AN HTTP ERROR
-            InputStream responseBody = connection.getErrorStream();
-            // Read and process error response body from InputStream ...
-            try {
-                if (responseBody != null) {
-                    String errorResponse = readStream(responseBody);
-                    return new Gson().fromJson(errorResponse, ErrorResponse.class);
-                } else {
-                    System.out.println("No error response body.");
-                }
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
+            return dealWithError(connection);
         }
-        return null;
     }
 
     public Object doPut(String urlString, JoinRequest joinReq) throws IOException {
-        URL url = new URL(urlString);
+        HttpURLConnection connection = setUpConnection(urlString, joinReq, "PUT");
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setReadTimeout(5000);
-        connection.setRequestMethod("PUT");
-        connection.setDoOutput(true);
-
-        connection.addRequestProperty("authorization", joinReq.authToken());
-
-        connection.connect();
-
-        try (OutputStream requestBody = connection.getOutputStream()) {
-            // Write request body to OutputStream ...
-            var jsonBody = new Gson().toJson(joinReq);
-            requestBody.write(jsonBody.getBytes());
-        }
+        writeBodyOut(connection, joinReq);
 
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             try (InputStream responseBody = connection.getInputStream()) {
@@ -177,19 +90,54 @@ public class ClientCommunicator {
         }
         else {
             // SERVER RETURNED AN HTTP ERROR
-            InputStream responseBody = connection.getErrorStream();
-            // Read and process error response body from InputStream ...
-            try {
-                if (responseBody != null) {
-                    String errorResponse = readStream(responseBody);
-                    return new Gson().fromJson(errorResponse, ErrorResponse.class);
-                } else {
-                    System.out.println("No error response body.");
-                }
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
+            return dealWithError(connection);
         }
-        return null;
+    }
+
+    private HttpURLConnection setUpConnection(String urlString, Object requestObj, String method) throws IOException {
+        URL url = new URL(urlString);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod(method);
+        connection.setDoOutput(true);
+
+        if (requestObj instanceof CreateGameRequest) {
+            connection.addRequestProperty("authorization", ((CreateGameRequest) requestObj).authToken());
+        } else if (requestObj instanceof LogoutRequest) {
+            connection.addRequestProperty("authorization", ((LogoutRequest) requestObj).authToken());
+        } else if (requestObj instanceof ListRequest) {
+            connection.addRequestProperty("authorization", ((ListRequest) requestObj).authToken());
+        } else if (requestObj instanceof JoinRequest) {
+            connection.addRequestProperty("authorization", ((JoinRequest) requestObj).authToken());
+        }
+
+        connection.connect();
+
+        return connection;
+    }
+
+    private void writeBodyOut(HttpURLConnection connection, Object joinReq) throws IOException {
+        try (OutputStream requestBody = connection.getOutputStream()) {
+            // Write request body to OutputStream ...
+            var jsonBody = new Gson().toJson(joinReq);
+            requestBody.write(jsonBody.getBytes());
+        }
+    }
+
+    private Object dealWithError(HttpURLConnection connection) throws IOException {
+        InputStream responseBody = connection.getErrorStream();
+        // Read and process error response body from InputStream ...
+        try {
+            if (responseBody != null) {
+                String errorResponse = readStream(responseBody);
+                return new Gson().fromJson(errorResponse, ErrorResponse.class);
+            } else {
+                return "No error response body.";
+            }
+        } catch (IOException e) {
+            return e.getMessage();
+        }
     }
 }

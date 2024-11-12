@@ -1,6 +1,4 @@
-package ui.reqRes;
-
-import java.util.Objects;
+package ui.reqres;
 
 public final record ErrorResponse (Integer status, String message){}
 

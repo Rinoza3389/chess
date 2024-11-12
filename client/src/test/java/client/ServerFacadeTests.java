@@ -1,7 +1,7 @@
 package client;
 
 import org.junit.jupiter.api.*;
-import ui.reqRes.*;
+import ui.reqres.*;
 import ui.ServerFacade;
 import server.Server;
 

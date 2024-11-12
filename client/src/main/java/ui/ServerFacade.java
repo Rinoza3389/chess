@@ -1,6 +1,6 @@
 package ui;
 
-import ui.reqRes.*;
+import ui.reqres.*;
 
 import java.io.IOException;
 
@@ -40,7 +40,7 @@ public class ServerFacade {
         }
         ClientCommunicator cliCom = new ClientCommunicator();
         try {
-            var logRes = cliCom.doPost("http://localhost:8080/session", logReq);
+            var logRes = cliCom.doPost("http://localhost:"+port+"/session", logReq);
             if (logRes instanceof LoginResponse) {
                 return logRes;
             }
