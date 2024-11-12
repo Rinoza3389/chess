@@ -36,16 +36,19 @@ public class Client {
                     String email = scanner.nextLine();
                     System.out.println("Password: ");
                     String pass = scanner.nextLine();
-
-                    RegisterRequest regReq = new RegisterRequest(user, pass, email);
-                    var output = facade.registerFacade(regReq);
-                    if (output instanceof RegisterResponse) {
-                        System.out.println("Registration successful!!");
-                        currAuthToken = ((RegisterResponse) output).authToken();
-                    } else if (output instanceof String) {
-                        System.out.println(output);
+                    if (user.trim().isEmpty() || email.trim().isEmpty() || pass.trim().isEmpty()) {
+                        System.out.println("PLease enter valid input for each option.");
                     } else {
-                        System.out.println("Error occurred but nothing was returned.");
+                        RegisterRequest regReq = new RegisterRequest(user, pass, email);
+                        var output = facade.registerFacade(regReq);
+                        if (output instanceof RegisterResponse) {
+                            System.out.println("Registration successful!!");
+                            currAuthToken = ((RegisterResponse) output).authToken();
+                        } else if (output instanceof String) {
+                            System.out.println(output);
+                        } else {
+                            System.out.println("Error occurred but nothing was returned.");
+                        }
                     }
                 } else if (selectedOption == 2) {
                     scanner.nextLine();
@@ -54,15 +57,19 @@ public class Client {
                     System.out.println("Password: ");
                     String pass = scanner.nextLine();
 
-                    LoginRequest logReq = new LoginRequest(user, pass);
-                    var output = facade.loginFacade(logReq);
-                    if (output instanceof LoginResponse) {
-                        System.out.println("Login successful!!");
-                        currAuthToken = ((LoginResponse) output).authToken();
-                    } else if (output instanceof String) {
-                        System.out.println(output);
+                    if (user.trim().isEmpty() || pass.trim().isEmpty()) {
+                        System.out.println("Please enter valid input for each option.");
                     } else {
-                        System.out.println("Error occurred but nothing was returned.");
+                        LoginRequest logReq = new LoginRequest(user, pass);
+                        var output = facade.loginFacade(logReq);
+                        if (output instanceof LoginResponse) {
+                            System.out.println("Login successful!!");
+                            currAuthToken = ((LoginResponse) output).authToken();
+                        } else if (output instanceof String) {
+                            System.out.println(output);
+                        } else {
+                            System.out.println("Error occurred but nothing was returned.");
+                        }
                     }
                 } else if (selectedOption == 3) {
                     System.out.println("Goodbye!!");
@@ -121,14 +128,18 @@ public class Client {
                     System.out.println("New game name: ");
                     String name = scanner.nextLine();
 
-                    CreateGameRequest cgReq = new CreateGameRequest(currAuthToken, name);
-                    var output = facade.createGameFacade(cgReq);
-                    if (output instanceof CreateGameResponse) {
-                        System.out.println("Game created successfully!! Now you need to join.");
-                    } else if (output instanceof String) {
-                        System.out.println(output);
+                    if (name.trim().isEmpty()) {
+                        System.out.println("Please enter valid input for each option.");
                     } else {
-                        System.out.println("Error occurred but nothing was returned.");
+                        CreateGameRequest cgReq = new CreateGameRequest(currAuthToken, name);
+                        var output = facade.createGameFacade(cgReq);
+                        if (output instanceof CreateGameResponse) {
+                            System.out.println("Game created successfully!! Now you need to join.");
+                        } else if (output instanceof String) {
+                            System.out.println(output);
+                        } else {
+                            System.out.println("Error occurred but nothing was returned.");
+                        }
                     }
                 }
                 else if (selectedOption == 3) {
