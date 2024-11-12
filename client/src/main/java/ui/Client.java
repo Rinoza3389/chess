@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class Client {
 
     static String currAuthToken = null;
-    static ServerFacade facade = new ServerFacade();
+    static ServerFacade facade = new ServerFacade(8080);
     static HashMap<Integer, GameData> listOfGames = null;
     static GameData currGame = null;
 

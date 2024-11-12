@@ -63,7 +63,7 @@ public class ClientCommunicator {
         return null;
     }
 
-    public Object doDelete(String urlString, LogoutRequest logReq) throws IOException{
+    public Object doDelete(String urlString, Object logReq) throws IOException{
         URL url = new URL(urlString);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -71,7 +71,8 @@ public class ClientCommunicator {
         connection.setReadTimeout(5000);
         connection.setRequestMethod("DELETE");
 
-        connection.addRequestProperty("authorization", logReq.authToken());
+        if (logReq instanceof LogoutRequest) {
+        connection.addRequestProperty("authorization", ((LogoutRequest) logReq).authToken()); }
 
         connection.connect();
 
