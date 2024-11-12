@@ -5,8 +5,7 @@ import ui.ReqRes.*;
 import ui.ServerFacade;
 import server.Server;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
@@ -46,7 +45,7 @@ public class ServerFacadeTests {
     public void registerBadInput() throws Exception {
         RegisterRequest regReq = new RegisterRequest("player1", null, "p1@email.com");
         var authData = facade.registerFacade(regReq);
-        assertTrue(authData instanceof ErrorResponse);
+        assertInstanceOf(ErrorResponse.class, authData);
     }
 
     @Test
