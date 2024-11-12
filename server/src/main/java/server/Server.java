@@ -2,12 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import dataaccess.DataAccess;
 import spark.*;
 import dataaccess.DataAccessException;
 import service.*;
-
-import java.sql.SQLException;
 
 
 public class Server {

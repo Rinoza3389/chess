@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessGame;
 import model.GameData;
 import server.*;
 
@@ -10,7 +9,7 @@ import java.util.Scanner;
 public class Client {
 
     static String currAuthToken = null;
-    static ServerFacade facade = new ServerFacade(8080);
+    static final ServerFacade facade = new ServerFacade(8080);
     static HashMap<Integer, GameData> listOfGames = null;
     static GameData currGame = null;
 
@@ -119,7 +118,7 @@ public class Client {
                                 } else {
                                     System.out.println("Joined successfully!!");
                                     ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                                    boardUI.main();
+                                    boardUI.run();
                                 }
                             } else { System.out.println("Sorry. Please try entering role color again.");}
                         }
@@ -158,7 +157,7 @@ public class Client {
                         } else {
                             System.out.println("Grabbing game for observation.");
                             ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                            boardUI.main();
+                            boardUI.run();
                         }
                     }
                 }
@@ -185,7 +184,7 @@ public class Client {
                             "Observe Game: Allows you to observe an existing game based on a specified game number.\n" +
                             "List Games: Lists all the games that currently exist.\n" +
                             "Help: Pulls up this menu with information about each option.\n" +
-                            "Logout: Allows you to logout and return to the main page.");
+                            "Logout: Allows you to logout and return to the run page.");
                 }
                 else if (selectedOption == 6) {
                     LogoutRequest logoutRequest = new LogoutRequest(currAuthToken);

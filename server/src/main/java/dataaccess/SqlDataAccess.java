@@ -17,7 +17,7 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SqlDataAccess implements DataAccess{
 
-    Random rand = new Random();
+    final Random rand = new Random();
 
     public SqlDataAccess() throws DataAccessException {
         configureDatabase();

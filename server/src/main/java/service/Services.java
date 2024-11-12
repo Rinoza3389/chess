@@ -4,7 +4,6 @@ import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 import server.*;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Services {
@@ -19,6 +18,7 @@ public class Services {
         }
     }
 
+    @SuppressWarnings("SameReturnValue")
     public Object clear() throws DataAccessException {
         dataAccess.clear();
         return null;

@@ -26,10 +26,10 @@ public class ChessBoardUI {
     }
 
     public ChessBoardUI (chess.ChessBoard currentBoard){
-        this.currentBoard = currentBoard;
+        ChessBoardUI.currentBoard = currentBoard;
     }
 
-    public static void main() {
+    public void run() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);

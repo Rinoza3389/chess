@@ -5,7 +5,7 @@ import server.*;
 import java.io.IOException;
 
 public class ServerFacade {
-    private Integer port = 8080;
+    private Integer port;
 
     public ServerFacade(Integer port) {
         this.port = port;

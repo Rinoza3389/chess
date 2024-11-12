@@ -3,7 +3,7 @@ package ui;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map;
+
 import server.*;
 import com.google.gson.Gson;
 
@@ -23,7 +23,7 @@ public class ClientCommunicator {
 
         connection.connect();
 
-        try (OutputStream requestBody = connection.getOutputStream();) {
+        try (OutputStream requestBody = connection.getOutputStream()) {
             // Write request body to OutputStream ...
             var jsonBody = new Gson().toJson(requestObj);
             requestBody.write(jsonBody.getBytes());
@@ -57,7 +57,7 @@ public class ClientCommunicator {
                     System.out.println("No error response body.");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
         return null;
@@ -94,7 +94,7 @@ public class ClientCommunicator {
                     System.out.println("No error response body.");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
         return new ErrorResponse(404, "Connection Failure");
@@ -143,7 +143,7 @@ public class ClientCommunicator {
                     System.out.println("No error response body.");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
         return null;
@@ -162,7 +162,7 @@ public class ClientCommunicator {
 
         connection.connect();
 
-        try (OutputStream requestBody = connection.getOutputStream();) {
+        try (OutputStream requestBody = connection.getOutputStream()) {
             // Write request body to OutputStream ...
             var jsonBody = new Gson().toJson(joinReq);
             requestBody.write(jsonBody.getBytes());
@@ -187,7 +187,7 @@ public class ClientCommunicator {
                     System.out.println("No error response body.");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
         return null;
