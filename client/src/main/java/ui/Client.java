@@ -165,7 +165,7 @@ public class Client {
                     ListRequest lisReq = new ListRequest(currAuthToken);
                     var output = facade.listFacade(lisReq);
                     if (output instanceof ListResponse) {
-                        listOfGames = new HashMap<Integer, GameData>() {};
+                        listOfGames = new HashMap<>() {};
                         Integer counter = 1;
                         for (GameData game : ((ListResponse) output).games()) {
                             System.out.format("%d: %s, White User=%s, Black User=%s\n", counter, game.gameName(), game.whiteUsername(), game.blackUsername());
