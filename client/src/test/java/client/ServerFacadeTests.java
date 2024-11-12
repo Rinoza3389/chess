@@ -5,6 +5,9 @@ import server.RegisterRequest;
 import server.*;
 import ui.ServerFacade;
 
+import javax.swing.*;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -108,7 +111,127 @@ public class ServerFacadeTests {
         LogoutRequest logReq = new LogoutRequest(null);
         var authData = facade.logoutFacade(logReq);
         assertTrue(authData instanceof ErrorResponse);
+
+        logReq = new LogoutRequest("null");
+        authData = facade.logoutFacade(logReq);
+        assertTrue(authData instanceof String);
     }
 
+    @Test
+    @DisplayName("Create Game Good")
+    public void createGame() throws Exception {
+        RegisterRequest regReq = new RegisterRequest("player1", "password", "p1@email.com");
+        var regRes = facade.registerFacade(regReq);
 
+        CreateGameRequest cgReq = new CreateGameRequest(((RegisterResponse) regRes).authToken(), "Christmas Jazz");
+        var authData = facade.createGameFacade(cgReq);
+        assertTrue(authData instanceof CreateGameResponse);
+    }
+
+    @Test
+    @DisplayName("Create Game Bad Input")
+    public void createGameBad() throws Exception {
+        RegisterRequest regReq = new RegisterRequest("player1", "password", "p1@email.com");
+        var regRes = facade.registerFacade(regReq);
+
+        CreateGameRequest cgReq = new CreateGameRequest(((RegisterResponse) regRes).authToken(), null);
+        var authData = facade.createGameFacade(cgReq);
+        assertTrue(authData instanceof ErrorResponse);
+    }
+
+    @Test
+    @DisplayName("Create Game No Auth")
+    public void createGameFake() throws Exception {
+        CreateGameRequest cgReq = new CreateGameRequest(null, "null");
+        var authData = facade.createGameFacade(cgReq);
+        assertTrue(authData instanceof ErrorResponse);
+
+        cgReq = new CreateGameRequest("null", "null");
+        authData = facade.createGameFacade(cgReq);
+        assertTrue(authData instanceof String);
+    }
+
+    @Test
+    @DisplayName("List Games Good")
+    public void list() throws Exception {
+        RegisterRequest regReq = new RegisterRequest("player1", "password", "p1@email.com");
+        var regRes = facade.registerFacade(regReq);
+
+        ListRequest lsReq = new ListRequest(((RegisterResponse) regRes).authToken());
+        var authData = facade.listFacade(lsReq);
+        assertTrue(authData instanceof ListResponse);
+        assertTrue(((ListResponse) authData).games().isEmpty());
+
+        CreateGameRequest cgReq = new CreateGameRequest(((RegisterResponse) regRes).authToken(), "Christmas Jazz");
+        facade.createGameFacade(cgReq);
+
+        authData = facade.listFacade(lsReq);
+        assertTrue(authData instanceof ListResponse);
+        assertFalse(((ListResponse) authData).games().isEmpty());
+    }
+
+    @Test
+    @DisplayName("List Games Bad Auth")
+    public void listFake() throws Exception {
+        RegisterRequest regReq = new RegisterRequest("player1", "password", "p1@email.com");
+        var regRes = facade.registerFacade(regReq);
+        ListRequest lsReq = new ListRequest(null);
+
+        CreateGameRequest cgReq = new CreateGameRequest(((RegisterResponse) regRes).authToken(), "Christmas Jazz");
+        facade.createGameFacade(cgReq);
+
+        var authData = facade.listFacade(lsReq);
+        assertTrue(authData instanceof ErrorResponse);
+
+        lsReq = new ListRequest("null");
+        authData = facade.listFacade(lsReq);
+        assertTrue(authData instanceof String);
+    }
+
+    @Test
+    @DisplayName("Join Game Good")
+    public void join() {
+        RegisterRequest regReq = new RegisterRequest("player1", "password", "p1@email.com");
+        var regRes = facade.registerFacade(regReq);
+
+        CreateGameRequest cgReq = new CreateGameRequest(((RegisterResponse) regRes).authToken(), "Christmas Jazz");
+        var gameData = facade.createGameFacade(cgReq);
+
+        JoinRequest joinReq = new JoinRequest(((RegisterResponse) regRes).authToken(), "WHITE", ((CreateGameResponse) gameData).gameID());
+        var authData = facade.joinFacade(joinReq);
+        assertTrue(authData == null);
+    }
+
+    @Test
+    @DisplayName("Join Game Bad Input")
+    public void joinBad() {
+        JoinRequest joinReq = new JoinRequest(null, "WHITE", null);
+        var authData = facade.joinFacade(joinReq);
+        assertTrue(authData instanceof ErrorResponse);
+    }
+
+    @Test
+    @DisplayName("Join Fake Game")
+    public void joinFakeGame() {
+        RegisterRequest regReq = new RegisterRequest("player1", "password", "p1@email.com");
+        var regRes = facade.registerFacade(regReq);
+
+        JoinRequest joinReq = new JoinRequest(((RegisterResponse) regRes).authToken(), "WHITE", 1234);
+        var authData = facade.joinFacade(joinReq);
+        assertTrue(authData instanceof String);
+    }
+
+    @Test
+    @DisplayName("Join Fake User")
+    public void joinFakeUser() {
+        RegisterRequest regReq = new RegisterRequest("player1", "password", "p1@email.com");
+        var regRes = facade.registerFacade(regReq);
+
+        CreateGameRequest cgReq = new CreateGameRequest(((RegisterResponse) regRes).authToken(), "Christmas Jazz");
+        var gameData = facade.createGameFacade(cgReq);
+
+        JoinRequest joinReq = new JoinRequest("((RegisterResponse) regRes).authToken()", "WHITE", ((CreateGameResponse) gameData).gameID());
+        var authData = facade.joinFacade(joinReq);
+        assertTrue(authData instanceof String);
+    }
 }
