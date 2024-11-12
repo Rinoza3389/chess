@@ -61,4 +61,24 @@ public class ServerFacade {
             return e.getMessage();
         }
     }
+
+    public Object createGameFacade(CreateGameRequest crReq) {
+        ClientCommunicator cliCom = new ClientCommunicator();
+        try {
+            var crRes = cliCom.doPost("http://localhost:8080/game", crReq);
+            if (crRes instanceof CreateGameResponse) {
+                return crRes;
+            }
+            else if (crRes instanceof ErrorResponse) {
+                return ((ErrorResponse) crRes).message();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            System.out.print(e.getMessage());
+        }
+        return null;
+    }
 }

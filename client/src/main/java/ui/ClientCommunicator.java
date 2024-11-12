@@ -17,23 +17,18 @@ public class ClientCommunicator {
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
 
-        connection.connect();
+        if (requestObj instanceof CreateGameRequest) {
+            connection.addRequestProperty("authorization", ((CreateGameRequest) requestObj).authToken());
+        }
 
-        Object body = null;
-        if (requestObj instanceof RegisterRequest) {
-            body = Map.of("username", ((RegisterRequest) requestObj).username(),
-                    "email", ((RegisterRequest) requestObj).email(), "password", ((RegisterRequest) requestObj).password());
-        }
-        else if (requestObj instanceof LoginRequest) {
-            body = Map.of("username", ((LoginRequest) requestObj).username(),
-                    "password", ((LoginRequest) requestObj).password());
-        }
+        connection.connect();
 
         try (OutputStream requestBody = connection.getOutputStream();) {
             // Write request body to OutputStream ...
-            var jsonBody = new Gson().toJson(body);
+            var jsonBody = new Gson().toJson(requestObj);
             requestBody.write(jsonBody.getBytes());
         }
+
 
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             try (InputStream responseBody = connection.getInputStream()) {
@@ -43,6 +38,9 @@ public class ClientCommunicator {
                 }
                 else if (requestObj instanceof LoginRequest) {
                     return new Gson().fromJson(inputStreamReader, LoginResponse.class);
+                }
+                else if (requestObj instanceof CreateGameRequest) {
+                    return new Gson().fromJson(inputStreamReader, CreateGameResponse.class);
                 }
             }
             // Read response body from InputStream ...

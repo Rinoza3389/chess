@@ -83,7 +83,19 @@ public class Client {
                     System.out.println("You Selected: Play Game");
                 }
                 else if (selectedOption == 2) {
-                    System.out.println("You Selected: Create Game");
+                    scanner.nextLine();
+                    System.out.println("New game name: ");
+                    String name = scanner.nextLine();
+
+                    CreateGameRequest cgReq = new CreateGameRequest(currAuthToken, name);
+                    var output = facade.createGameFacade(cgReq);
+                    if (output instanceof CreateGameResponse) {
+                        System.out.println("Game created successfully!! Now you need to join.");
+                    } else if (output instanceof String) {
+                        System.out.println(output);
+                    } else {
+                        System.out.println("Error occurred but nothing was returned.");
+                    }
                 }
                 else if (selectedOption == 3) {
                     System.out.println("You Selected: Observe Game");
