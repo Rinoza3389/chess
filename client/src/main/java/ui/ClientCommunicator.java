@@ -147,4 +147,48 @@ public class ClientCommunicator {
         }
         return null;
     }
+
+    public Object doPut(String urlString, JoinRequest joinReq) throws IOException {
+        URL url = new URL(urlString);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("PUT");
+        connection.setDoOutput(true);
+
+        connection.addRequestProperty("authorization", joinReq.authToken());
+
+        connection.connect();
+
+        try (OutputStream requestBody = connection.getOutputStream();) {
+            // Write request body to OutputStream ...
+            var jsonBody = new Gson().toJson(joinReq);
+            requestBody.write(jsonBody.getBytes());
+        }
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            try (InputStream responseBody = connection.getInputStream()) {
+                InputStreamReader inputStreamReader = new InputStreamReader(responseBody);
+                return new Gson().fromJson(inputStreamReader, JoinResponse.class);
+
+            }
+        }
+        else {
+            // SERVER RETURNED AN HTTP ERROR
+            InputStream responseBody = connection.getErrorStream();
+            // Read and process error response body from InputStream ...
+            try {
+                if (responseBody != null) {
+                    String errorResponse = readStream(responseBody);
+                    return new Gson().fromJson(errorResponse, ErrorResponse.class);
+                } else {
+                    System.out.println("No error response body.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 }

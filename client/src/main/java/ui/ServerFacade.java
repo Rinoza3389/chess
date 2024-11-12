@@ -101,4 +101,21 @@ public class ServerFacade {
         }
         return null;
     }
+
+    public Object joinFacade(JoinRequest joinReq) {
+        ClientCommunicator cliCom = new ClientCommunicator();
+        try {
+            var joinRes = cliCom.doPut("http://localhost:8080/game", joinReq);
+            if (joinRes instanceof ErrorResponse) {
+                return ((ErrorResponse) joinRes).message();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            System.out.print(e.getMessage());
+        }
+        return null;
+    }
 }

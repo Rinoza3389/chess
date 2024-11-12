@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import model.GameData;
 import server.*;
 
@@ -11,6 +12,7 @@ public class Client {
     static String currAuthToken = null;
     static ServerFacade facade = new ServerFacade();
     static HashMap<Integer, GameData> listOfGames = null;
+    static GameData currGame = null;
 
     public static void main(String[] args) {
         // Create a Scanner object
@@ -85,7 +87,34 @@ public class Client {
                         "6: Logout");
                 int selectedOption = scanner.nextInt();
                 if (selectedOption == 1) {
-                    System.out.println("You Selected: Play Game");
+                    if (listOfGames == null) {
+                        System.out.println("Please go confirm game options by selecting 'List Games.'");
+                    }
+                    else {
+
+                        System.out.println("Enter the number of the game you'd like to join: ");
+                        Integer number = scanner.nextInt();
+
+                        currGame = listOfGames.get(number);
+                        if (currGame == null) {
+                            System.out.println("Sorry! That game doesn't seem to exist.");
+                        } else {
+                            scanner.nextLine();
+                            System.out.println("Which role would you like to play? (WHITE or BLACK): ");
+                            String role = scanner.nextLine();
+                            if (role.equals("WHITE") || role.equals("BLACK")) {
+                                JoinRequest joinReq = new JoinRequest(currAuthToken, role, currGame.gameID());
+                                var output = facade.joinFacade(joinReq);
+                                if (output instanceof String){
+                                    System.out.println(output);
+                                } else {
+                                    System.out.println("Joined successfully!!");
+                                    ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
+                                    boardUI.main();
+                                }
+                            } else { System.out.println("Sorry. Please try entering role color again.");}
+                        }
+                    }
                 }
                 else if (selectedOption == 2) {
                     scanner.nextLine();

@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -30,7 +29,7 @@ public class ChessBoardUI {
         this.currentBoard = currentBoard;
     }
 
-    public static void main(String[] args) {
+    public static void main() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -40,6 +39,7 @@ public class ChessBoardUI {
         drawBlackBoard(out);
 
         out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
     }
 
     private static String getPieceSymbol(ChessPiece.PieceType type) {
