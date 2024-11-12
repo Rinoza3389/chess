@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import ui.ReqRes.*;
+import ui.reqRes.*;
 import com.google.gson.Gson;
 
 public class ClientCommunicator {

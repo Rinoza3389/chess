@@ -14,15 +14,15 @@ import static ui.EscapeSequences.*;
 public class ChessBoardUI {
 
     static chess.ChessBoard currentBoard;
-    private static final Map<String, String> pieceSymbols = new HashMap<>();
+    private static final Map<String, String> PIECE_SYMBOLS = new HashMap<>();
 
     static {
-        pieceSymbols.put("PAWN", WHITE_PAWN);
-        pieceSymbols.put("ROOK", WHITE_ROOK);
-        pieceSymbols.put("KNIGHT", WHITE_KNIGHT);
-        pieceSymbols.put("BISHOP", WHITE_BISHOP);
-        pieceSymbols.put("QUEEN", WHITE_QUEEN);
-        pieceSymbols.put("KING", WHITE_KING);
+        PIECE_SYMBOLS.put("PAWN", WHITE_PAWN);
+        PIECE_SYMBOLS.put("ROOK", WHITE_ROOK);
+        PIECE_SYMBOLS.put("KNIGHT", WHITE_KNIGHT);
+        PIECE_SYMBOLS.put("BISHOP", WHITE_BISHOP);
+        PIECE_SYMBOLS.put("QUEEN", WHITE_QUEEN);
+        PIECE_SYMBOLS.put("KING", WHITE_KING);
     }
 
     public ChessBoardUI (chess.ChessBoard currentBoard){
@@ -43,7 +43,7 @@ public class ChessBoardUI {
     }
 
     private static String getPieceSymbol(ChessPiece.PieceType type) {
-        return pieceSymbols.getOrDefault(type.name(), " ");
+        return PIECE_SYMBOLS.getOrDefault(type.name(), " ");
     }
 
     private static void printAlphaText(PrintStream out, ChessGame.TeamColor currColor) {

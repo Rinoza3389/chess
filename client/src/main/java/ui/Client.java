@@ -1,7 +1,7 @@
 package ui;
 
 import model.GameData;
-import ui.ReqRes.*;
+import ui.reqRes.*;
 
 import java.util.HashMap;
 import java.util.Scanner;
@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Client {
 
     static String currAuthToken = null;
-    static final ServerFacade facade = new ServerFacade(8080);
+    static final ServerFacade FACADE = new ServerFacade(8080);
     static HashMap<Integer, GameData> listOfGames = null;
     static GameData currGame = null;
 
@@ -28,48 +28,9 @@ public class Client {
                         "4: Help");
                 int selectedOption = scanner.nextInt();
                 if (selectedOption == 1) {
-                    scanner.nextLine();
-                    System.out.println("Username: ");
-                    String user = scanner.nextLine();
-                    System.out.println("Email: ");
-                    String email = scanner.nextLine();
-                    System.out.println("Password: ");
-                    String pass = scanner.nextLine();
-                    if (user.trim().isEmpty() || email.trim().isEmpty() || pass.trim().isEmpty()) {
-                        System.out.println("PLease enter valid input for each option.");
-                    } else {
-                        RegisterRequest regReq = new RegisterRequest(user, pass, email);
-                        var output = facade.registerFacade(regReq);
-                        if (output instanceof RegisterResponse) {
-                            System.out.println("Registration successful!!");
-                            currAuthToken = ((RegisterResponse) output).authToken();
-                        } else if (output instanceof String) {
-                            System.out.println(output);
-                        } else {
-                            System.out.println("Error occurred but nothing was returned.");
-                        }
-                    }
+                    register(scanner);
                 } else if (selectedOption == 2) {
-                    scanner.nextLine();
-                    System.out.println("Username: ");
-                    String user = scanner.nextLine();
-                    System.out.println("Password: ");
-                    String pass = scanner.nextLine();
-
-                    if (user.trim().isEmpty() || pass.trim().isEmpty()) {
-                        System.out.println("Please enter valid input for each option.");
-                    } else {
-                        LoginRequest logReq = new LoginRequest(user, pass);
-                        var output = facade.loginFacade(logReq);
-                        if (output instanceof LoginResponse) {
-                            System.out.println("Login successful!!");
-                            currAuthToken = ((LoginResponse) output).authToken();
-                        } else if (output instanceof String) {
-                            System.out.println(output);
-                        } else {
-                            System.out.println("Error occurred but nothing was returned.");
-                        }
-                    }
+                    login(scanner);
                 } else if (selectedOption == 3) {
                     System.out.println("Goodbye!!");
                     break;
@@ -95,88 +56,16 @@ public class Client {
                         "6: Logout");
                 int selectedOption = scanner.nextInt();
                 if (selectedOption == 1) {
-                    if (listOfGames == null) {
-                        System.out.println("Please go confirm game options by selecting 'List Games.'");
-                    }
-                    else {
-
-                        System.out.println("Enter the number of the game you'd like to join: ");
-                        Integer number = scanner.nextInt();
-
-                        currGame = listOfGames.get(number);
-                        if (currGame == null) {
-                            System.out.println("Sorry! That game doesn't seem to exist.");
-                        } else {
-                            scanner.nextLine();
-                            System.out.println("Which role would you like to play? (WHITE or BLACK): ");
-                            String role = scanner.nextLine();
-                            if (role.equals("WHITE") || role.equals("BLACK")) {
-                                JoinRequest joinReq = new JoinRequest(currAuthToken, role, currGame.gameID());
-                                var output = facade.joinFacade(joinReq);
-                                if (output instanceof String){
-                                    System.out.println(output);
-                                } else {
-                                    System.out.println("Joined successfully!!");
-                                    ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                                    boardUI.run();
-                                }
-                            } else { System.out.println("Sorry. Please try entering role color again.");}
-                        }
-                    }
+                    play(scanner);
                 }
                 else if (selectedOption == 2) {
-                    scanner.nextLine();
-                    System.out.println("New game name: ");
-                    String name = scanner.nextLine();
-
-                    if (name.trim().isEmpty()) {
-                        System.out.println("Please enter valid input for each option.");
-                    } else {
-                        CreateGameRequest cgReq = new CreateGameRequest(currAuthToken, name);
-                        var output = facade.createGameFacade(cgReq);
-                        if (output instanceof CreateGameResponse) {
-                            System.out.println("Game created successfully!! Now you need to join.");
-                        } else if (output instanceof String) {
-                            System.out.println(output);
-                        } else {
-                            System.out.println("Error occurred but nothing was returned.");
-                        }
-                    }
+                    create(scanner);
                 }
                 else if (selectedOption == 3) {
-                    if (listOfGames == null) {
-                        System.out.println("Please go confirm game options by selecting 'List Games.'");
-                    }
-                    else {
-                        System.out.println("Enter the number of the game you'd like to observe: ");
-                        Integer number = scanner.nextInt();
-
-                        currGame = listOfGames.get(number);
-                        if (currGame == null) {
-                            System.out.println("Sorry! That game doesn't seem to exist.");
-                        } else {
-                            System.out.println("Grabbing game for observation.");
-                            ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                            boardUI.run();
-                        }
-                    }
+                    observe(scanner);
                 }
                 else if (selectedOption == 4) {
-                    ListRequest lisReq = new ListRequest(currAuthToken);
-                    var output = facade.listFacade(lisReq);
-                    if (output instanceof ListResponse) {
-                        listOfGames = new HashMap<>() {};
-                        Integer counter = 1;
-                        for (GameData game : ((ListResponse) output).games()) {
-                            System.out.format("%d: %s, White User=%s, Black User=%s\n", counter, game.gameName(), game.whiteUsername(), game.blackUsername());
-                            listOfGames.put(counter, game);
-                            counter++;
-                        }
-                    } else if (output instanceof String) {
-                        System.out.println(output);
-                    } else {
-                        System.out.println("Error occurred but nothing was returned.");
-                    }
+                    list();
                 }
                 else if (selectedOption == 5) {
                     System.out.println("Play Game: Allows you to join an existing game based on specified game number and color choice.\n" +
@@ -187,15 +76,9 @@ public class Client {
                             "Logout: Allows you to logout and return to the run page.");
                 }
                 else if (selectedOption == 6) {
-                    LogoutRequest logoutRequest = new LogoutRequest(currAuthToken);
-                    var output = facade.logoutFacade(logoutRequest);
-                    if (output==null) {
-                        System.out.println("Logout Successful!!");
-                        currAuthToken = null;
-                    }
-                    else if (output instanceof String) {
-                        System.out.println(output);
-                    }
+                    logout();
+                } else {
+                    System.out.println("Invalid option entered. Please try again.");
                 }
             }
         }
@@ -203,4 +86,153 @@ public class Client {
         // Close the scanner
         scanner.close();
     }
+
+    private static void register(Scanner scanner) {
+        scanner.nextLine();
+        System.out.println("Username: ");
+        String user = scanner.nextLine();
+        System.out.println("Email: ");
+        String email = scanner.nextLine();
+        System.out.println("Password: ");
+        String pass = scanner.nextLine();
+        if (user.trim().isEmpty() || email.trim().isEmpty() || pass.trim().isEmpty()) {
+            System.out.println("PLease enter valid input for each option.");
+        } else {
+            RegisterRequest regReq = new RegisterRequest(user, pass, email);
+            var output = FACADE.registerFacade(regReq);
+            if (output instanceof RegisterResponse) {
+                System.out.println("Registration successful!!");
+                currAuthToken = ((RegisterResponse) output).authToken();
+            } else if (output instanceof String) {
+                System.out.println(output);
+            } else {
+                System.out.println("Error occurred but nothing was returned.");
+            }
+        }
+    }
+
+    private static void login(Scanner scanner) {
+        scanner.nextLine();
+        System.out.println("Username: ");
+        String user = scanner.nextLine();
+        System.out.println("Password: ");
+        String pass = scanner.nextLine();
+
+        if (user.trim().isEmpty() || pass.trim().isEmpty()) {
+            System.out.println("Please enter valid input for each option.");
+        } else {
+            LoginRequest logReq = new LoginRequest(user, pass);
+            var output = FACADE.loginFacade(logReq);
+            if (output instanceof LoginResponse) {
+                System.out.println("Login successful!!");
+                currAuthToken = ((LoginResponse) output).authToken();
+            } else if (output instanceof String) {
+                System.out.println(output);
+            } else {
+                System.out.println("Error occurred but nothing was returned.");
+            }
+        }
+
+    }
+
+    private static void play(Scanner scanner) {
+        if (listOfGames == null) {
+            System.out.println("Please go confirm game options by selecting 'List Games.'");
+        }
+        else {
+
+            System.out.println("Enter the number of the game you'd like to join: ");
+            Integer number = scanner.nextInt();
+
+            currGame = listOfGames.get(number);
+            if (currGame == null) {
+                System.out.println("Sorry! That game doesn't seem to exist.");
+            } else {
+                scanner.nextLine();
+                System.out.println("Which role would you like to play? (WHITE or BLACK): ");
+                String role = scanner.nextLine();
+                if (role.equals("WHITE") || role.equals("BLACK")) {
+                    JoinRequest joinReq = new JoinRequest(currAuthToken, role, currGame.gameID());
+                    var output = FACADE.joinFacade(joinReq);
+                    if (output instanceof String){
+                        System.out.println(output);
+                    } else {
+                        System.out.println("Joined successfully!!");
+                        ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
+                        boardUI.run();
+                    }
+                } else { System.out.println("Sorry. Please try entering role color again.");}
+            }
+        }
+    }
+
+    private static void create(Scanner scanner) {
+        scanner.nextLine();
+        System.out.println("New game name: ");
+        String name = scanner.nextLine();
+
+        if (name.trim().isEmpty()) {
+            System.out.println("Please enter valid input for each option.");
+        } else {
+            CreateGameRequest cgReq = new CreateGameRequest(currAuthToken, name);
+            var output = FACADE.createGameFacade(cgReq);
+            if (output instanceof CreateGameResponse) {
+                System.out.println("Game created successfully!! Now you need to join.");
+            } else if (output instanceof String) {
+                System.out.println(output);
+            } else {
+                System.out.println("Error occurred but nothing was returned.");
+            }
+        }
+    }
+
+    private static void observe(Scanner scanner) {
+        if (listOfGames == null) {
+            System.out.println("Please go confirm game options by selecting 'List Games.'");
+        }
+        else {
+            System.out.println("Enter the number of the game you'd like to observe: ");
+            Integer number = scanner.nextInt();
+
+            currGame = listOfGames.get(number);
+            if (currGame == null) {
+                System.out.println("Sorry! That game doesn't seem to exist.");
+            } else {
+                System.out.println("Grabbing game for observation.");
+                ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
+                boardUI.run();
+            }
+        }
+    }
+
+    private static void list() {
+        ListRequest lisReq = new ListRequest(currAuthToken);
+        var output = FACADE.listFacade(lisReq);
+        if (output instanceof ListResponse) {
+            listOfGames = new HashMap<>() {};
+            Integer counter = 1;
+            for (GameData game : ((ListResponse) output).games()) {
+                System.out.format("%d: %s, White User=%s, Black User=%s\n", counter, game.gameName(), game.whiteUsername(), game.blackUsername());
+                listOfGames.put(counter, game);
+                counter++;
+            }
+        } else if (output instanceof String) {
+            System.out.println(output);
+        } else {
+            System.out.println("Error occurred but nothing was returned.");
+        }
+    }
+
+    private static void logout() {
+        LogoutRequest logoutRequest = new LogoutRequest(currAuthToken);
+        var output = FACADE.logoutFacade(logoutRequest);
+        if (output==null) {
+            System.out.println("Logout Successful!!");
+            currAuthToken = null;
+        }
+        else if (output instanceof String) {
+            System.out.println(output);
+        }
+    }
+
 }

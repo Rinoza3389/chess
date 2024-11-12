@@ -1,6 +1,6 @@
 package ui;
 
-import ui.ReqRes.*;
+import ui.reqRes.*;
 
 import java.io.IOException;
 
