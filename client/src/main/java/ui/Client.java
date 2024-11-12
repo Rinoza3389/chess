@@ -4,6 +4,7 @@ import model.GameData;
 import ui.reqres.*;
 
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
@@ -143,26 +144,31 @@ public class Client {
         else {
 
             System.out.println("Enter the number of the game you'd like to join: ");
-            Integer number = scanner.nextInt();
-
-            currGame = listOfGames.get(number);
-            if (currGame == null) {
-                System.out.println("Sorry! That game doesn't seem to exist.");
-            } else {
+            try {
+                Integer number = scanner.nextInt();
+                currGame = listOfGames.get(number);
+                if (currGame == null) {
+                    System.out.println("Sorry! That game doesn't seem to exist.");
+                } else {
+                    scanner.nextLine();
+                    System.out.println("Which role would you like to play? (WHITE or BLACK): ");
+                    String role = scanner.nextLine();
+                    if (role.equals("WHITE") || role.equals("BLACK")) {
+                        JoinRequest joinReq = new JoinRequest(currAuthToken, role, currGame.gameID());
+                        var output = FACADE.joinFacade(joinReq);
+                        if (output instanceof String){
+                            System.out.println(output);
+                        } else {
+                            System.out.println("Joined successfully!!");
+                            ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
+                            boardUI.run();
+                        }
+                    } else { System.out.println("Sorry. Please try entering role color again.");}
+                }
+            }
+            catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number");
                 scanner.nextLine();
-                System.out.println("Which role would you like to play? (WHITE or BLACK): ");
-                String role = scanner.nextLine();
-                if (role.equals("WHITE") || role.equals("BLACK")) {
-                    JoinRequest joinReq = new JoinRequest(currAuthToken, role, currGame.gameID());
-                    var output = FACADE.joinFacade(joinReq);
-                    if (output instanceof String){
-                        System.out.println(output);
-                    } else {
-                        System.out.println("Joined successfully!!");
-                        ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                        boardUI.run();
-                    }
-                } else { System.out.println("Sorry. Please try entering role color again.");}
             }
         }
     }
