@@ -4,8 +4,9 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import server.*;
+import ui.ReqRes.*;
 import com.google.gson.Gson;
+import ui.ReqRes.RegisterRequest;
 
 public class ClientCommunicator {
     public Object doPost(String urlString, Object requestObj) throws IOException {

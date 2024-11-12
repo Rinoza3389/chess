@@ -1,7 +1,7 @@
 package ui;
 
 import model.GameData;
-import server.*;
+import ui.ReqRes.*;
 
 import java.util.HashMap;
 import java.util.Scanner;
