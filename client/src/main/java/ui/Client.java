@@ -75,8 +75,10 @@ public class Client {
                     System.out.println("Goodbye!!");
                     break;
                 } else if (selectedOption == 4) {
-                    System.out.println("Register: Allows you to create an account and start playing! Will require a username, email, and password.\n" +
-                            "Login: Allows you to sign into an already existing account and start playing! Will require a username and password.\n" +
+                    System.out.println("Register: Allows you to create an account and start playing! " +
+                            "Will require a username, email, and password.\n" +
+                            "Login: Allows you to sign into an already existing account and start playing! " +
+                            "Will require a username and password.\n" +
                             "Quit: Allows you to exit the game.\n" +
                             "Help: Pulls up this menu with information about each option.\n");
                 } else {
