@@ -110,4 +110,41 @@ public class ClientCommunicator {
 
         return responseBuilder.toString().trim();
     }
+
+    public Object doGet(String urlString, ListRequest listReq) throws IOException {
+        URL url = new URL(urlString);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("GET");
+
+        connection.addRequestProperty("authorization", listReq.authToken());
+
+        connection.connect();
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            try (InputStream responseBody = connection.getInputStream()) {
+                InputStreamReader inputStreamReader = new InputStreamReader(responseBody);
+                return new Gson().fromJson(inputStreamReader, ListResponse.class);
+
+            }
+        }
+        else {
+            // SERVER RETURNED AN HTTP ERROR
+            InputStream responseBody = connection.getErrorStream();
+            // Read and process error response body from InputStream ...
+            try {
+                if (responseBody != null) {
+                    String errorResponse = readStream(responseBody);
+                    return new Gson().fromJson(errorResponse, ErrorResponse.class);
+                } else {
+                    System.out.println("No error response body.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 }

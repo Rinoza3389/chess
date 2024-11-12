@@ -81,4 +81,24 @@ public class ServerFacade {
         }
         return null;
     }
+
+    public Object listFacade(ListRequest lisReq) {
+        ClientCommunicator cliCom = new ClientCommunicator();
+        try {
+            var lisRes = cliCom.doGet("http://localhost:8080/game", lisReq);
+            if (lisRes instanceof ListResponse) {
+                return lisRes;
+            }
+            else if (lisRes instanceof ErrorResponse) {
+                return ((ErrorResponse) lisRes).message();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            System.out.print(e.getMessage());
+        }
+        return null;
+    }
 }

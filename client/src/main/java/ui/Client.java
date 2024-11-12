@@ -1,13 +1,16 @@
 package ui;
 
+import model.GameData;
 import server.*;
 
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Client {
 
     static String currAuthToken = null;
     static ServerFacade facade = new ServerFacade();
+    static HashMap<Integer, GameData> listOfGames = null;
 
     public static void main(String[] args) {
         // Create a Scanner object
@@ -70,7 +73,9 @@ public class Client {
                 } else {
                     System.out.println("Invalid option entered. Please try again.");
                 }
-            } else {
+            }
+
+            else {
                 System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
                         "1: Play Game\n" +
                         "2: Create Game\n" +
@@ -101,7 +106,21 @@ public class Client {
                     System.out.println("You Selected: Observe Game");
                 }
                 else if (selectedOption == 4) {
-                    System.out.println("You Selected: List Games");
+                    ListRequest lisReq = new ListRequest(currAuthToken);
+                    var output = facade.listFacade(lisReq);
+                    if (output instanceof ListResponse) {
+                        listOfGames = new HashMap<Integer, GameData>() {};
+                        Integer counter = 1;
+                        for (GameData game : ((ListResponse) output).games()) {
+                            System.out.format("%d: %s, White User=%s, Black User=%s\n", counter, game.gameName(), game.whiteUsername(), game.blackUsername());
+                            listOfGames.put(counter, game);
+                            counter++;
+                        }
+                    } else if (output instanceof String) {
+                        System.out.println(output);
+                    } else {
+                        System.out.println("Error occurred but nothing was returned.");
+                    }
                 }
                 else if (selectedOption == 5) {
                     System.out.println("Play Game: Allows you to join an existing game based on specified game number and color choice.\n" +
