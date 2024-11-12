@@ -132,7 +132,22 @@ public class Client {
                     }
                 }
                 else if (selectedOption == 3) {
-                    System.out.println("You Selected: Observe Game");
+                    if (listOfGames == null) {
+                        System.out.println("Please go confirm game options by selecting 'List Games.'");
+                    }
+                    else {
+                        System.out.println("Enter the number of the game you'd like to observe: ");
+                        Integer number = scanner.nextInt();
+
+                        currGame = listOfGames.get(number);
+                        if (currGame == null) {
+                            System.out.println("Sorry! That game doesn't seem to exist.");
+                        } else {
+                            System.out.println("Grabbing game for observation.");
+                            ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
+                            boardUI.main();
+                        }
+                    }
                 }
                 else if (selectedOption == 4) {
                     ListRequest lisReq = new ListRequest(currAuthToken);
