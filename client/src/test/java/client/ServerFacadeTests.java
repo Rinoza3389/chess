@@ -1,11 +1,9 @@
 package client;
 
 import org.junit.jupiter.api.*;
-import server.RegisterRequest;
-import server.*;
+import ui.ReqRes.*;
 import ui.ServerFacade;
-
-import javax.swing.*;
+import server.Server;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

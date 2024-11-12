@@ -6,7 +6,6 @@ import java.net.URL;
 
 import ui.ReqRes.*;
 import com.google.gson.Gson;
-import ui.ReqRes.RegisterRequest;
 
 public class ClientCommunicator {
     public Object doPost(String urlString, Object requestObj) throws IOException {
