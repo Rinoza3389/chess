@@ -37,8 +37,7 @@ public class ChessBoardUI {
         if (role == null || role.equals("WHITE")) {
             drawWhiteBoard(out);
         }
-        out.println();
-        if (role == null || role.equals("BLACK")) {
+        else if (role.equals("BLACK")) {
             drawBlackBoard(out);
         }
 

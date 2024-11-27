@@ -101,7 +101,8 @@ public class Client {
                     System.out.println("You chose: highlight legal moves.");
                 }
                 else if (selectedOption == 3) {
-                    System.out.println("You chose: redraw chess board.");
+                    ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
+                    boardUI.run(role);
                 }
                 else if (selectedOption == 4) {
                     System.out.println("Make Move: Allows you to input what move you want to make.\n" +
@@ -197,6 +198,7 @@ public class Client {
                         var output = FACADE.joinFacade(joinReq);
                         if (output instanceof String){
                             System.out.println(output);
+                            currGame = null;
                         } else {
                             System.out.println("Joined successfully!!");
                             ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
