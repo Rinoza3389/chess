@@ -47,7 +47,7 @@ public class Client {
                 }
             }
 
-            else {
+            else if (currGame == null){
                 System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
                         "1: Play Game\n" +
                         "2: Create Game\n" +
@@ -80,6 +80,44 @@ public class Client {
                 else if (selectedOption == 6) {
                     logout();
                 } else {
+                    System.out.println("Invalid option entered. Please try again.");
+                }
+            }
+
+            else {
+                System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
+                        "1: Make Move\n" +
+                        "2: Highlight Legal Moves\n" +
+                        "3: Redraw Chess Board\n" +
+                        "4: Help\n" +
+                        "5: Leave\n" +
+                        "6: Resign");
+                int selectedOption = scanner.nextInt();
+                if (selectedOption == 1) {
+                    System.out.println("You chose: make move.");
+                }
+                else if (selectedOption == 2) {
+                    System.out.println("You chose: highlight legal moves.");
+                }
+                else if (selectedOption == 3) {
+                    System.out.println("You chose: redraw chess board.");
+                }
+                else if (selectedOption == 4) {
+                    System.out.println("Make Move: Allows you to input what move you want to make.\n" +
+                            "Highlight Legal Moves: Allows you to input the piece for which you want ot highlight legal moves. " +
+                            "The selected piece and all squares it can legally move to will be highlighted.\n" +
+                            "Redraw Chess Board: Redraws the chess board on your screen.\n" +
+                            "Help: Pulls up this menu with information about each option.\n" +
+                            "Leave: Removes you from the game and sends you back to the main menu.\n" +
+                            "Resign: You forfeit the game and the game is over. :(");
+                }
+                else if (selectedOption == 5) {
+                    System.out.println("You chose: leave.");
+                }
+                else if (selectedOption == 6) {
+                    System.out.println("You chose: resign.");
+                }
+                else {
                     System.out.println("Invalid option entered. Please try again.");
                 }
             }
