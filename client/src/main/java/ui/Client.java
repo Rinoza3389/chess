@@ -13,6 +13,7 @@ public class Client {
     static final ServerFacade FACADE = new ServerFacade(8080);
     static HashMap<Integer, GameData> listOfGames = null;
     static GameData currGame = null;
+    static String role = null;
 
     public static void main(String[] args) {
         // Create a Scanner object
@@ -190,7 +191,7 @@ public class Client {
                 } else {
                     scanner.nextLine();
                     System.out.println("Which role would you like to play? (WHITE or BLACK): ");
-                    String role = scanner.nextLine();
+                    role = scanner.nextLine();
                     if (role.equals("WHITE") || role.equals("BLACK")) {
                         JoinRequest joinReq = new JoinRequest(currAuthToken, role, currGame.gameID());
                         var output = FACADE.joinFacade(joinReq);
@@ -199,9 +200,13 @@ public class Client {
                         } else {
                             System.out.println("Joined successfully!!");
                             ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                            boardUI.run();
+                            boardUI.run(role);
                         }
-                    } else { System.out.println("Sorry. Please try entering role color again.");}
+                    }
+                    else {
+                        System.out.println("Sorry. Please try entering role color again.");
+                        role = null;
+                    }
                 }
             }
             catch (InputMismatchException e) {
@@ -245,7 +250,7 @@ public class Client {
             } else {
                 System.out.println("Grabbing game for observation.");
                 ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                boardUI.run();
+                boardUI.run(role);
             }
         }
     }

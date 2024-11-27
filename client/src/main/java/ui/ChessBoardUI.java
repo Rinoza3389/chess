@@ -29,14 +29,18 @@ public class ChessBoardUI {
         ChessBoardUI.currentBoard = currentBoard;
     }
 
-    public void run() {
+    public void run(String role) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
 
-        drawWhiteBoard(out);
+        if (role == null || role.equals("WHITE")) {
+            drawWhiteBoard(out);
+        }
         out.println();
-        drawBlackBoard(out);
+        if (role == null || role.equals("BLACK")) {
+            drawBlackBoard(out);
+        }
 
         out.print(RESET_BG_COLOR);
         out.print(RESET_TEXT_COLOR);
@@ -95,7 +99,7 @@ public class ChessBoardUI {
         out.printf(" %d ", row);
     }
 
-    private static void drawWhiteBoard(PrintStream out) {
+    public static void drawWhiteBoard(PrintStream out) {
         printAlphaText(out, ChessGame.TeamColor.WHITE);
         boolean blackSquare = true;
         for (int row = 8; row >= 1; row--) {
@@ -112,7 +116,7 @@ public class ChessBoardUI {
         printAlphaText(out, ChessGame.TeamColor.WHITE);
     }
 
-    private static void drawBlackBoard(PrintStream out) {
+    public static void drawBlackBoard(PrintStream out) {
         printAlphaText(out, ChessGame.TeamColor.BLACK);
         boolean blackSquare = true;
         for (int row = 1; row <= 8; row++) {
