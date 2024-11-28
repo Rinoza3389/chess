@@ -1,11 +1,11 @@
 package ui;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import model.GameData;
 import ui.reqres.*;
 
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class Client {
 
@@ -98,11 +98,11 @@ public class Client {
                     System.out.println("You chose: make move.");
                 }
                 else if (selectedOption == 2) {
-                    System.out.println("You chose: highlight legal moves.");
+                    highlight(scanner);
                 }
                 else if (selectedOption == 3) {
                     ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                    boardUI.run(role);
+                    boardUI.run(role, null, null);
                 }
                 else if (selectedOption == 4) {
                     System.out.println("Make Move: Allows you to input what move you want to make.\n" +
@@ -114,7 +114,10 @@ public class Client {
                             "Resign: You forfeit the game and the game is over. :(");
                 }
                 else if (selectedOption == 5) {
-                    System.out.println("You chose: leave.");
+//                    if (role != null) {
+//
+//                    }
+//                    currGame = null;
                 }
                 else if (selectedOption == 6) {
                     System.out.println("You chose: resign.");
@@ -202,7 +205,7 @@ public class Client {
                         } else {
                             System.out.println("Joined successfully!!");
                             ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                            boardUI.run(role);
+                            boardUI.run(role, null, null);
                         }
                     }
                     else {
@@ -252,7 +255,7 @@ public class Client {
             } else {
                 System.out.println("Grabbing game for observation.");
                 ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                boardUI.run(role);
+                boardUI.run(role, null, null);
             }
         }
     }
@@ -284,6 +287,55 @@ public class Client {
         }
         else if (output instanceof String) {
             System.out.println(output);
+        }
+    }
+
+    private static ChessPosition getPos(Scanner scanner) {
+        System.out.println("Enter the column letter (A-H): ");
+        scanner.nextLine();
+        String input = scanner.nextLine().trim();
+
+        if (input.length() == 1 && input.matches("[A-Ha-h]")) {
+            char letter = input.toUpperCase().charAt(0);
+
+            if (letter >= 'A' && letter <= 'H') {
+                int col = letter - 'A' + 1;
+                System.out.println("Enter the row number (1-8): ");
+                try {
+                    int row = scanner.nextInt();
+                    if (row >= 1 && row <= 8) {
+                        return new ChessPosition(row, col);
+                    } else {
+                        System.out.println("Invalid row. Please enter a number from 1 to 8.");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid row. Please enter a number from 1 to 8.");
+                    scanner.nextLine();
+                }
+            } else {
+                System.out.println("Invalid column. Please enter a letter from A to H.");
+            }
+        } else {
+            System.out.println("Invalid column. Please enter a letter from A to H.");
+        }
+        return null;
+    }
+
+    private static void highlight(Scanner scanner) {
+        System.out.println("Please enter the coordinates for the piece you'd like to view legal moves for.");
+        ChessPosition currentPos = getPos(scanner);
+        if (currentPos != null) {
+            Collection<ChessMove> legalMoves = currGame.game().validMoves(currentPos);
+            if (legalMoves != null) {
+                Set<ChessPosition> possPos = new HashSet<>();
+                for (ChessMove move : legalMoves) {
+                    possPos.add(move.getEndPosition());
+                }
+                ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
+                boardUI.run(role, possPos, currentPos);
+            } else {
+                System.out.println("There is no piece in this location.");
+            }
         }
     }
 

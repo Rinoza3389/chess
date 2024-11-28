@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static ui.EscapeSequences.*;
 
@@ -29,16 +30,16 @@ public class ChessBoardUI {
         ChessBoardUI.currentBoard = currentBoard;
     }
 
-    public void run(String role) {
+    public void run(String role, Set<ChessPosition> possPos, ChessPosition currPos) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
 
         if (role == null || role.equals("WHITE")) {
-            drawWhiteBoard(out);
+            drawWhiteBoard(out, possPos, currPos);
         }
         else if (role.equals("BLACK")) {
-            drawBlackBoard(out);
+            drawBlackBoard(out, possPos, currPos);
         }
 
         out.print(RESET_BG_COLOR);
@@ -69,12 +70,23 @@ public class ChessBoardUI {
         out.println();
     }
 
-    private static void drawSquare(PrintStream out, int row, int col, boolean blackSquare) {
+    private static void drawSquare(PrintStream out, int row, int col, boolean blackSquare, boolean highlight, ChessPosition currPos) {
         if (blackSquare) {
-            out.print(SET_BG_COLOR_PERSIAN_BLUE);
+            if (highlight) {
+                out.print(SET_BG_COLOR_DARK_MAGENTA);
+            } else {
+                out.print(SET_BG_COLOR_PERSIAN_BLUE);
+            }
         }
         else {
-            out.print(SET_BG_COLOR_PALE_BLUE);
+            if (highlight) {
+                out.print(SET_BG_COLOR_PEARLY_PURPLE);
+            } else {
+                out.print(SET_BG_COLOR_PALE_BLUE);
+            }
+        }
+        if (currPos != null && row == currPos.getRow() && col == currPos.getColumn()) {
+            out.print(SET_BG_COLOR_YELLOW);
         }
         ChessPiece currPiece = currentBoard.getPiece(new ChessPosition(row, col));
         if (currPiece != null) {
@@ -98,14 +110,19 @@ public class ChessBoardUI {
         out.printf(" %d ", row);
     }
 
-    public static void drawWhiteBoard(PrintStream out) {
+    public static void drawWhiteBoard(PrintStream out, Set<ChessPosition> possPos, ChessPosition currPos) {
         printAlphaText(out, ChessGame.TeamColor.WHITE);
         boolean blackSquare = true;
         for (int row = 8; row >= 1; row--) {
             drawFrontOfRow(out, row);
             blackSquare = !blackSquare;
             for (int col = 1; col <= 8; col++) {
-                drawSquare(out, row, col, blackSquare);
+                if (possPos != null && possPos.contains(new ChessPosition(row, col))) {
+                    drawSquare(out, row, col, blackSquare, true, currPos);
+                }
+                else {
+                    drawSquare(out, row, col, blackSquare, false, currPos);
+                }
                 blackSquare = !blackSquare;
             }
             drawFrontOfRow(out, row);
@@ -115,14 +132,19 @@ public class ChessBoardUI {
         printAlphaText(out, ChessGame.TeamColor.WHITE);
     }
 
-    public static void drawBlackBoard(PrintStream out) {
+    public static void drawBlackBoard(PrintStream out, Set<ChessPosition> possPos, ChessPosition currPos) {
         printAlphaText(out, ChessGame.TeamColor.BLACK);
         boolean blackSquare = true;
         for (int row = 1; row <= 8; row++) {
             drawFrontOfRow(out, row);
             blackSquare = !blackSquare;
             for (int col = 8; col >= 1; col--) {
-                drawSquare(out, row, col, blackSquare);
+                if (possPos != null && possPos.contains(new ChessPosition(row, col))) {
+                    drawSquare(out, row, col, blackSquare, true, currPos);
+                }
+                else {
+                    drawSquare(out, row, col, blackSquare, false, currPos);
+                }
                 blackSquare = !blackSquare;
             }
             drawFrontOfRow(out, row);
