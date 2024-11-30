@@ -25,6 +25,7 @@ public class ServerMessage {
         return this.serverMessageType;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -42,3 +43,4 @@ public class ServerMessage {
         return Objects.hash(getServerMessageType());
     }
 }
+

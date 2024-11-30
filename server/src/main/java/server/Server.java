@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import server.websocket.WebSocketHandler;
 import spark.*;
 import dataaccess.DataAccessException;
 import service.*;
@@ -10,6 +11,7 @@ import service.*;
 public class Server {
 
     private final Services mainService  = new Services();
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
 
     public Server() {
 
@@ -21,6 +23,8 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.webSocket("/ws", webSocketHandler);
+
         Spark.delete("/db", this::clearHandler);
         Spark.post("/user", this::registerHandler);
         Spark.post("/session", this::loginHandler);

@@ -7,6 +7,7 @@ import websocket.commands.UserGameCommand;
 import org.eclipse.jetty.websocket.api.Session;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 public class WebSocketHandler {
@@ -32,17 +33,19 @@ public class WebSocketHandler {
             //figure it out in a minute
         }
 
-        connections.saveSession(command.getGameID(), session);
+//        connections.saveSession(command.getGameID(), session);
 
         switch (command.getCommandType()) {
-            case CONNECT -> connect(session, username, command.getGameID());
+            case CONNECT -> connect(session, username, command.getAuthToken(), command.getGameID());
         }
     }
 
-    private void connect(Session session, String username, Integer gameID) {
-        connections.join(username, gameID, session);
+    private void connect(Session session, String username, String authToken, Integer gameID) {
+        String key = username + authToken;
+
+        connections.join(key, username, gameID, session);
         var message = String.format("%s has joined the game.", username);
-        var notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        var notification= new NotificationMessage(message);
         connections.broadcast(username, notification);
     }
 

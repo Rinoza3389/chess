@@ -1,6 +1,5 @@
 package websocket;
 
-import dataaccess.DataAccessException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 import com.google.gson.Gson;
