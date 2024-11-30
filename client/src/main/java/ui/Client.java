@@ -114,6 +114,7 @@ public class Client {
                             "Resign: You forfeit the game and the game is over. :(");
                 }
                 else if (selectedOption == 5) {
+                    System.out.println("You chose: leave.");
 //                    if (role != null) {
 //
 //                    }
