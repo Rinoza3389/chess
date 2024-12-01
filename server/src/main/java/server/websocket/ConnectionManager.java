@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.GsonServerMessage;
 import websocket.messages.*;
 
 public class ConnectionManager {
@@ -19,14 +20,11 @@ public class ConnectionManager {
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.key.equals(excludeKey)) {
+                    String msg = GsonServerMessage.getGson().toJson(serverMessage);
                     try {
-                        switch (serverMessage.getServerMessageType()) {
-                            case LOAD_GAME -> c.send(((LoadGameMessage) serverMessage).getMessage());
-                            case NOTIFICATION -> c.send(((NotificationMessage) serverMessage).getMessage());
-                            case ERROR -> c.send(((ErrorMessage) serverMessage).getMessage());
-                        }
+                        c.send(msg);
                     } catch (IOException e) {
-                        //BURN THIS BRIDGE LATER
+                        //*woman shrug emoji*
                     }
                 }
             } else {
@@ -41,14 +39,11 @@ public class ConnectionManager {
 
     public void sendRoot(String key, ServerMessage serverMessage) {
         Connection c = connections.get(key);
+        String msg = GsonServerMessage.getGson().toJson(serverMessage);
         try {
-            switch (serverMessage.getServerMessageType()) {
-                case LOAD_GAME -> c.send(((LoadGameMessage) serverMessage).getMessage());
-                case NOTIFICATION -> c.send(((NotificationMessage) serverMessage).getMessage());
-                case ERROR -> c.send(((ErrorMessage) serverMessage).getMessage());
-            }
+            c.send(msg);
         } catch (IOException e) {
-            //BURN THIS BRIDGE LATER
+            //*woman shrug emoji*
         }
     }
 }

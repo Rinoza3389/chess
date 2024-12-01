@@ -4,9 +4,9 @@ public class LoadGameMessage extends ServerMessage {
 
     String message;
 
-    public LoadGameMessage(String msg) {
+    public LoadGameMessage(String message) {
         super(ServerMessageType.LOAD_GAME);
-        this.message = msg;
+        this.message = message;
     }
 
     public String getMessage() {
