@@ -38,4 +38,17 @@ public class ConnectionManager {
             connections.remove(c.key);
         }
     }
+
+    public void sendRoot(String key, ServerMessage serverMessage) {
+        Connection c = connections.get(key);
+        try {
+            switch (serverMessage.getServerMessageType()) {
+                case LOAD_GAME -> c.send(((LoadGameMessage) serverMessage).getMessage());
+                case NOTIFICATION -> c.send(((NotificationMessage) serverMessage).getMessage());
+                case ERROR -> c.send(((ErrorMessage) serverMessage).getMessage());
+            }
+        } catch (IOException e) {
+            //BURN THIS BRIDGE LATER
+        }
+    }
 }

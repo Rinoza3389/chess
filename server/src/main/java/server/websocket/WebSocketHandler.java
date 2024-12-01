@@ -1,15 +1,19 @@
 package server.websocket;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.SqlDataAccess;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
 import org.eclipse.jetty.websocket.api.Session;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
+@WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
     private final DataAccess dataAccess;
@@ -43,10 +47,31 @@ public class WebSocketHandler {
     private void connect(Session session, String username, String authToken, Integer gameID) {
         String key = username + authToken;
 
-        connections.join(key, username, gameID, session);
-        var message = String.format("%s has joined the game.", username);
-        var notification= new NotificationMessage(message);
-        connections.broadcast(username, notification);
+        try {
+            String message;
+            GameData gameData = dataAccess.getGame(gameID);
+            if (gameData.whiteUsername().equals(username)) {
+                ChessGame.TeamColor currColor = ChessGame.TeamColor.WHITE;
+                message = String.format("%s has joined the game as white.", username);
+            } else if (gameData.blackUsername().equals(username)) {
+                ChessGame.TeamColor currColor = ChessGame.TeamColor.BLACK;
+                message = String.format("%s has joined the game as black.", username);
+            } else {
+                ChessGame.TeamColor currColor = null;
+                message = String.format("%s has joined as an observer.", username);
+            }
+
+            connections.join(key, username, gameID, session);
+            LoadGameMessage loadGameMessage = new LoadGameMessage("Successfully joined the game.");
+            connections.sendRoot(key, loadGameMessage);
+
+            var notification= new NotificationMessage(message);
+            connections.broadcast(key, notification);
+        } catch (DataAccessException e) {
+            //Burn that bridge if we get to it.
+        }
+
+
     }
 
 }

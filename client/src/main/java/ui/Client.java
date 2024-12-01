@@ -6,16 +6,10 @@ import model.GameData;
 import ui.reqres.*;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
-import websocket.messages.ErrorMessage;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
 import java.util.*;
 
-import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
-
-public class Client implements NotificationHandler {
+public class Client {
 
     static String currAuthToken = null;
     static final ServerFacade FACADE = new ServerFacade(8080);
@@ -24,12 +18,16 @@ public class Client implements NotificationHandler {
     static String role = null;
     private static WebSocketFacade ws;
 
-    public Client() {
+    static {
         try {
-            ws = new WebSocketFacade(8080, this);
+            ws = new WebSocketFacade(8080, new NotificationHandler());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
         }
+    }
+
+    public Client() {
+
     }
 
     public static void main(String[] args) {
@@ -362,12 +360,6 @@ public class Client implements NotificationHandler {
         }
     }
 
-    public void notify(ServerMessage notification) {
-        switch (notification.getServerMessageType()) {
-            case LOAD_GAME -> System.out.println(SET_TEXT_COLOR_RED + ((LoadGameMessage) notification).getMessage());
-            case NOTIFICATION -> System.out.println(SET_TEXT_COLOR_RED + ((NotificationMessage) notification).getMessage());
-            case ERROR -> System.out.println(SET_TEXT_COLOR_RED + ((ErrorMessage) notification).getMessage());
-        }
-    }
+
 
 }
