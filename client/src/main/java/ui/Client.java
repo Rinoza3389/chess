@@ -221,9 +221,7 @@ public class Client {
                         } else {
                             try {
                                 ws.connectToGame(currAuthToken, currGame.gameID());
-                                System.out.println("Joined successfully!!");
-                                ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                                boardUI.run(role, null, null);
+
                             } catch (Exception e) {
                                 System.out.println(e.getMessage());
                             }

@@ -6,12 +6,16 @@ import dataaccess.SqlDataAccess;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import websocket.GsonServerMessage;
 import websocket.commands.UserGameCommand;
 import org.eclipse.jetty.websocket.api.Session;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
+
+import java.io.IOException;
 
 @WebSocket
 public class WebSocketHandler {
@@ -33,15 +37,22 @@ public class WebSocketHandler {
         String username = null;
         try {
             username = dataAccess.getAuth(command.getAuthToken()).username();
-        } catch (DataAccessException e) {
-            //figure it out in a minute
+            switch (command.getCommandType()) {
+                case CONNECT -> connect(session, username, command.getAuthToken(), command.getGameID());
+            }
+        } catch (DataAccessException | NullPointerException e) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: unauthorized");
+            String message = GsonServerMessage.getGson().toJson(errorMessage);
+            try {
+                session.getRemote().sendString(message);
+            } catch (IOException ex) {
+                //woman shrug emoji
+            }
         }
 
 //        connections.saveSession(command.getGameID(), session);
 
-        switch (command.getCommandType()) {
-            case CONNECT -> connect(session, username, command.getAuthToken(), command.getGameID());
-        }
+
     }
 
     private void connect(Session session, String username, String authToken, Integer gameID) {
@@ -49,26 +60,33 @@ public class WebSocketHandler {
 
         try {
             String message;
+            String currColor;
             GameData gameData = dataAccess.getGame(gameID);
             if (gameData.whiteUsername().equals(username)) {
-                ChessGame.TeamColor currColor = ChessGame.TeamColor.WHITE;
+                currColor = "WHITE";
                 message = String.format("%s has joined the game as white.", username);
             } else if (gameData.blackUsername().equals(username)) {
-                ChessGame.TeamColor currColor = ChessGame.TeamColor.BLACK;
+                currColor = "BLACK";
                 message = String.format("%s has joined the game as black.", username);
             } else {
-                ChessGame.TeamColor currColor = null;
+                currColor = null;
                 message = String.format("%s has joined as an observer.", username);
             }
 
             connections.join(key, username, gameID, session);
-            LoadGameMessage loadGameMessage = new LoadGameMessage("Successfully joined the game.");
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.game(), currColor);
             connections.sendRoot(key, loadGameMessage);
 
             var notification= new NotificationMessage(message);
             connections.broadcast(key, notification);
-        } catch (DataAccessException e) {
-            //Burn that bridge if we get to it.
+        } catch (DataAccessException | NullPointerException e) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: unauthorized");
+            String msg = GsonServerMessage.getGson().toJson(errorMessage);
+            try {
+                session.getRemote().sendString(msg);
+            } catch (IOException ex) {
+                //woman shrug emoji
+            }
         }
 
 
