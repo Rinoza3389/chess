@@ -15,6 +15,10 @@ public class ConnectionManager {
         connections.put(key, connection);
     }
 
+    public void leave(String key) {
+        connections.remove(key);
+    }
+
     public void broadcast(String excludeKey, ServerMessage serverMessage) {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
@@ -45,5 +49,9 @@ public class ConnectionManager {
         } catch (IOException e) {
             //*woman shrug emoji*
         }
+    }
+
+    public Connection get(String key) {
+        return connections.get(key);
     }
 }

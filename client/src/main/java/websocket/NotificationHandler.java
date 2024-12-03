@@ -2,7 +2,6 @@ package websocket;
 
 import chess.ChessGame;
 import chess.ChessPosition;
-import model.GameData;
 import ui.ChessBoardUI;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -11,7 +10,7 @@ import websocket.messages.ServerMessage;
 
 import java.util.Set;
 
-import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
+import static ui.EscapeSequences.*;
 
 public class NotificationHandler {
     ChessGame currGameState = null;
@@ -26,9 +25,11 @@ public class NotificationHandler {
                 this.currGameState = ((LoadGameMessage) notification).getGame();
                 new ChessBoardUI(((LoadGameMessage) notification).getGame().getBoard()).run(((LoadGameMessage) notification).getRole(), null, null);
             case NOTIFICATION:
-                System.out.println(SET_TEXT_COLOR_RED + ((NotificationMessage) notification).getMessage());
+                System.out.println(SET_TEXT_COLOR_GREEN + ((NotificationMessage) notification).getMessage());
+                System.out.print(RESET_TEXT_COLOR);
             case ERROR :
                 System.out.println(SET_TEXT_COLOR_RED + ((ErrorMessage) notification).getMessage());
+                System.out.print(RESET_TEXT_COLOR);
         }
     }
 
