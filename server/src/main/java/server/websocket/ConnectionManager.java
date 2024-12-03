@@ -10,8 +10,8 @@ import websocket.messages.*;
 public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void join(String key, String username, Integer gameID, Session session) {
-        var connection = new Connection(key, username, gameID, session);
+    public void join(String key, String username, Integer gameID, Session session, String role) {
+        var connection = new Connection(key, username, gameID, session, role);
         connections.put(key, connection);
     }
 

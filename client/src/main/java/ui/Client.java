@@ -1,6 +1,8 @@
 package ui;
 
+import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
 import ui.reqres.*;
@@ -111,7 +113,7 @@ public class Client {
                         "6: Resign");
                 int selectedOption = scanner.nextInt();
                 if (selectedOption == 1) {
-                    System.out.println("You chose: make move.");
+                    makeMove(scanner);
                 }
                 else if (selectedOption == 2) {
                     highlight(scanner);
@@ -362,6 +364,37 @@ public class Client {
         }
     }
 
+    private static void makeMove(Scanner scanner) {
+        System.out.println("Please enter the coordinates for the piece you'd like to move.");
+        ChessPosition currentPos = getPos(scanner);
+        System.out.println("Please enter the coordinates for the place you'd like to move to.");
+        ChessPosition futurePos = getPos(scanner);
+        ChessPiece currPiece = notifHandler.getGame().getBoard().getPiece(currentPos);
+        ChessMove move = new ChessMove(currentPos, futurePos, null);
+        if (currPiece != null && currPiece.getPieceType()== ChessPiece.PieceType.PAWN) {
+            if ((role.equals("WHITE") && futurePos.getRow() == 8 && currPiece.getTeamColor() == ChessGame.TeamColor.WHITE) || (role.equals("BLACK") && futurePos.getRow() == 1 && currPiece.getTeamColor() == ChessGame.TeamColor.BLACK))
+            {
+                System.out.println("Please enter your choice of promotion piece. (BISHOP, ROOK, KNIGHT, QUEEN)");
+                String promo = scanner.nextLine();
+                switch (promo) {
+                    case "QUEEN" : move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.QUEEN);
+                    case "BISHOP" : move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.BISHOP);
+                    case "ROOK" : move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.ROOK);
+                    case "KNIGHT" : move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.KNIGHT);
+                    default :
+                        System.out.println("Please enter a valid promo type.");
+                        move = null;
+                }
 
+            }
+        }
+        if (move != null) {
+            try {
+                ws.makeMove(move, currAuthToken, currGame.gameID());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
 
 }

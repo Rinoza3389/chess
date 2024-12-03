@@ -40,4 +40,8 @@ public class NotificationHandler {
     public void run(String role) {
         new ChessBoardUI(currGameState.getBoard()).run(role, null, null);
     }
+
+    public ChessGame getGame() {
+        return currGameState;
+    }
 }

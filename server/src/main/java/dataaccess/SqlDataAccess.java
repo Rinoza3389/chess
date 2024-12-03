@@ -212,6 +212,26 @@ public class SqlDataAccess implements DataAccess{
         }
     }
 
+    public void updateGameStatus(Integer gameID, ChessGame game) throws DataAccessException {
+        try (var conn = getConnection()) {
+            try {
+                var jsonGame = new Gson().toJson(game);
+                PreparedStatement preparedStatement = conn.prepareStatement("UPDATE GameData SET game=? WHERE gameID=?");
+                preparedStatement.setString(1, jsonGame);
+                preparedStatement.setInt(2, gameID);
+                try {
+                    preparedStatement.executeUpdate();
+                } catch (SQLException e) {
+                    throw new DataAccessException(e.getMessage());
+                }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
     public ArrayList<GameData> listGames() throws DataAccessException {
         var result = new ArrayList<GameData>();
         try (var conn = getConnection()) {

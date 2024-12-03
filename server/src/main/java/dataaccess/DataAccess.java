@@ -1,4 +1,5 @@
 package dataaccess;
+import chess.ChessGame;
 import model.*;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public interface DataAccess {
     GameData getGame(Integer gameID) throws DataAccessException;
 
     void updateGame(String playerColor, Integer gameID, String username) throws DataAccessException;
+
+    void updateGameStatus(Integer gameID, ChessGame game) throws DataAccessException;
 
     ArrayList<GameData> listGames() throws DataAccessException;
 }

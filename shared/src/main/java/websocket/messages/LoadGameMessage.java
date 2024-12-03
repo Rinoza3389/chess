@@ -19,4 +19,5 @@ public class LoadGameMessage extends ServerMessage {
     public String getRole() {
         return this.role;
     }
+
 }

@@ -72,6 +72,12 @@ public class MemoryDataAccess implements DataAccess {
         gameDataSet.put(gameID, newGameData);
     }
 
+    public void updateGameStatus(Integer gameID, ChessGame game) throws DataAccessException {
+        GameData curGameData = gameDataSet.get(gameID);
+        GameData newGameData = new GameData(gameID, curGameData.whiteUsername(), curGameData.blackUsername(), curGameData.gameName(), game);
+        gameDataSet.put(gameID, newGameData);
+    }
+
     public ArrayList<GameData> listGames() {
         return new ArrayList<>(gameDataSet.values());
     }

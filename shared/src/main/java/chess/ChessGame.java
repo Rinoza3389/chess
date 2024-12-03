@@ -14,6 +14,7 @@ public class ChessGame {
 
     private ChessBoard gameBoard = new ChessBoard();
     private TeamColor turnTeam = TeamColor.WHITE;
+    private boolean activeGame = true;
 
     public ChessGame() {
         gameBoard.resetBoard();
@@ -34,6 +35,10 @@ public class ChessGame {
     public void setTeamTurn(TeamColor team) {
         turnTeam = team;
     }
+
+    public void endGame() {activeGame = false;}
+
+    public boolean getGameStatus() {return activeGame;}
 
     @Override
     public boolean equals(Object o) {
