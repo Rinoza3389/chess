@@ -17,10 +17,11 @@ public class Client {
     static GameData currGame = null;
     static String role = null;
     private static WebSocketFacade ws;
+    private static NotificationHandler notifHandler = new NotificationHandler();
 
     static {
         try {
-            ws = new WebSocketFacade(8080, new NotificationHandler());
+            ws = new WebSocketFacade(8080, notifHandler);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -350,8 +351,7 @@ public class Client {
                 for (ChessMove move : legalMoves) {
                     possPos.add(move.getEndPosition());
                 }
-                ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                boardUI.run(role, possPos, currentPos);
+                notifHandler.highlight(role, possPos, currentPos);
             } else {
                 System.out.println("There is no piece in this location.");
             }
