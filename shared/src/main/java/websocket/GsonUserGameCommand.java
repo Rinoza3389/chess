@@ -20,11 +20,11 @@ class UserGameCommandDeserializer implements JsonDeserializer<UserGameCommand> {
     @Override
     public UserGameCommand deserialize(JsonElement jsonElm, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json = jsonElm.getAsJsonObject();
-        String type = json.get("CommandType").getAsString();
+        String type = json.get("commandType").getAsString();
         if (type.equals("MAKE_MOVE")) {
-            return context.deserialize(json, MakeMoveCommand.class);
+            return new Gson().fromJson(json, MakeMoveCommand.class);
         } else {
-            return context.deserialize(json, UserGameCommand.class);
+            return new Gson().fromJson(json, UserGameCommand.class);
         }
     }
 }
