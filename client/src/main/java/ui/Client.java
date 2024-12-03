@@ -117,8 +117,7 @@ public class Client {
                     highlight(scanner);
                 }
                 else if (selectedOption == 3) {
-                    ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                    boardUI.run(role, null, null);
+                    notifHandler.run(role);
                 }
                 else if (selectedOption == 4) {
                     System.out.println("Make Move: Allows you to input what move you want to make.\n" +

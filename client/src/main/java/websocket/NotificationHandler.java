@@ -35,4 +35,8 @@ public class NotificationHandler {
     public void highlight(String role, Set<ChessPosition> possPos, ChessPosition currPos) {
         new ChessBoardUI(currGameState.getBoard()).run(role, possPos, currPos);
     }
+
+    public void run(String role) {
+        new ChessBoardUI(currGameState.getBoard()).run(role, null, null);
+    }
 }
