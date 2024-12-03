@@ -272,9 +272,12 @@ public class Client {
             if (currGame == null) {
                 System.out.println("Sorry! That game doesn't seem to exist.");
             } else {
-                System.out.println("Grabbing game for observation.");
-                ChessBoardUI boardUI = new ChessBoardUI(currGame.game().getBoard());
-                boardUI.run(role, null, null);
+                try {
+                    ws.connectToGame(currAuthToken, currGame.gameID());
+
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
