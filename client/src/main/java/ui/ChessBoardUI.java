@@ -146,7 +146,8 @@ public class ChessBoardUI {
         printAlphaText(out, ChessGame.TeamColor.BLACK);
     }
 
-    private static void determineSquareDraw(PrintStream out, Set<ChessPosition> possPos, ChessPosition currPos, int row, int col, boolean blackSquare) {
+    private static void determineSquareDraw(PrintStream out, Set<ChessPosition> possPos,
+                                            ChessPosition currPos, int row, int col, boolean blackSquare) {
         if (possPos != null && possPos.contains(new ChessPosition(row, col))) {
             drawSquare(out, row, col, blackSquare, true, currPos);
         }

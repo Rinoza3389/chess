@@ -65,7 +65,6 @@ public class Client {
                     System.out.println("Invalid option entered. Please try again.");
                 }
             }
-
             else if (currGame == null){
                 System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
                         "1: Play Game\n" +
@@ -131,24 +130,10 @@ public class Client {
                             "Resign: You forfeit the game and the game is over. :(");
                 }
                 else if (selectedOption == 5) {
-                    try {
-                        ws.leaveGame(currAuthToken, currGame.gameID());
-                        role = null;
-                        currGame = null;
-                    } catch (Exception e) {
-                        System.out.println("Error occurred while leaving the game.");
-                    }
+                    leave(scanner);
                 }
                 else if (selectedOption == 6) {
-                    System.out.println("Are you sure you want to resign?\n1. Yes\n2. No");
-                    int answer = scanner.nextInt();
-                    if (answer == 1) {
-                        try {
-                            ws.resignGame(currAuthToken, currGame.gameID());
-                        } catch (Exception e) {
-                            System.out.println("Error occurred while leaving the game.");
-                        }
-                    }
+                    resign(scanner);
                 }
                 else {
                     System.out.println("Invalid option entered. Please try again.");
@@ -407,4 +392,25 @@ public class Client {
         }
     }
 
+    private static void resign(Scanner scanner) {
+        System.out.println("Are you sure you want to resign?\n1. Yes\n2. No");
+        int answer = scanner.nextInt();
+        if (answer == 1) {
+            try {
+                ws.resignGame(currAuthToken, currGame.gameID());
+            } catch (Exception e) {
+                System.out.println("Error occurred while leaving the game.");
+            }
+        }
+    }
+
+    private static void leave(Scanner scanner) {
+        try {
+            ws.leaveGame(currAuthToken, currGame.gameID());
+            role = null;
+            currGame = null;
+        } catch (Exception e) {
+            System.out.println("Error occurred while leaving the game.");
+        }
+    }
 }
