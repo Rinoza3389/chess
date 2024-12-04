@@ -169,10 +169,16 @@ public class WebSocketHandler {
                             gameStatus = new NotificationMessage(String.format("%s is in stalemate. Game is over at a draw.", gameData.blackUsername()));
                         }
                         dataAccess.updateGameStatus(gameID, currGame);
-                        for (Connection c : connections.connections.values()) {
-                            LoadGameMessage loadGameMessage = new LoadGameMessage(currGame, c.role);
-                            connections.sendRoot(c.key, loadGameMessage);
+
+                        LoadGameMessage loadGameMessage = new LoadGameMessage(currGame, currTeam.toString());
+                        connections.broadcast(key, loadGameMessage);
+                        String msg = GsonServerMessage.getGson().toJson(loadGameMessage);
+                        try {
+                            session.getRemote().sendString(msg);
+                        } catch (IOException ex) {
+                            //woman shrug emoji
                         }
+
                         String pastPos = reformat(move.getStartPosition());
                         String newPos = reformat(move.getEndPosition());
                         NotificationMessage notificationMessage = null;
@@ -185,7 +191,7 @@ public class WebSocketHandler {
 
                         if (gameStatus != null) {
                             connections.broadcast(key, gameStatus);
-                            String msg = GsonServerMessage.getGson().toJson(gameStatus);
+                            msg = GsonServerMessage.getGson().toJson(gameStatus);
                             try {
                                 session.getRemote().sendString(msg);
                             } catch (IOException ex) {
@@ -253,26 +259,36 @@ public class WebSocketHandler {
         try {
             GameData gameData = dataAccess.getGame(gameID);
             ChessGame currGame = gameData.game();
-            ChessGame.TeamColor currTeam = null;
-            if (gameData.whiteUsername().equals(username)) {
-                currTeam = ChessGame.TeamColor.WHITE;
-            } else if (gameData.blackUsername().equals(username)) {
-                currTeam = ChessGame.TeamColor.BLACK;
-            }
+            if (currGame.getGameStatus()) {
+                ChessGame.TeamColor currTeam = null;
+                if (gameData.whiteUsername().equals(username)) {
+                    currTeam = ChessGame.TeamColor.WHITE;
+                } else if (gameData.blackUsername().equals(username)) {
+                    currTeam = ChessGame.TeamColor.BLACK;
+                }
 
-            if (currTeam != null) {
-                currGame.endGame();
-                dataAccess.updateGameStatus(gameID, currGame);
-                NotificationMessage resignMessage = new NotificationMessage(String.format("%s has resigned. The game is now over.", username));
-                connections.broadcast(key, resignMessage);
-                String msg = GsonServerMessage.getGson().toJson(resignMessage);
-                try {
-                    session.getRemote().sendString(msg);
-                } catch (IOException ex) {
-                    //woman shrug emoji
+                if (currTeam != null) {
+                    currGame.endGame();
+                    dataAccess.updateGameStatus(gameID, currGame);
+                    NotificationMessage resignMessage = new NotificationMessage(String.format("%s has resigned. The game is now over.", username));
+                    connections.broadcast(key, resignMessage);
+                    String msg = GsonServerMessage.getGson().toJson(resignMessage);
+                    try {
+                        session.getRemote().sendString(msg);
+                    } catch (IOException ex) {
+                        //woman shrug emoji
+                    }
+                } else {
+                    ErrorMessage errorMessage = new ErrorMessage("Error: The observer cannot resign.");
+                    String msg = GsonServerMessage.getGson().toJson(errorMessage);
+                    try {
+                        session.getRemote().sendString(msg);
+                    } catch (IOException ex) {
+                        //woman shrug emoji
+                    }
                 }
             } else {
-                ErrorMessage errorMessage = new ErrorMessage("Error: The observer cannot resign.");
+                ErrorMessage errorMessage = new ErrorMessage("Error: Cannot resign already ended game.");
                 String msg = GsonServerMessage.getGson().toJson(errorMessage);
                 try {
                     session.getRemote().sendString(msg);
