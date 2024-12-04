@@ -113,11 +113,7 @@ public class Client {
                         "6: Resign");
                 int selectedOption = scanner.nextInt();
                 if (selectedOption == 1) {
-                    if (role != null) {
-                        makeMove(scanner);
-                    } else {
-                        System.out.println("Observers cannot make moves.");
-                    }
+                    makeMove(scanner);
                 }
                 else if (selectedOption == 2) {
                     highlight(scanner);

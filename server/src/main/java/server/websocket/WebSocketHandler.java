@@ -21,6 +21,7 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @WebSocket
 public class WebSocketHandler {
@@ -138,53 +139,69 @@ public class WebSocketHandler {
         try {
             GameData gameData = dataAccess.getGame(gameID);
             ChessGame currGame = gameData.game();
+            ChessGame.TeamColor currTeam = null;
+            if (gameData.whiteUsername().equals(username)) {
+                currTeam = ChessGame.TeamColor.WHITE;
+            } else if (gameData.blackUsername().equals(username)) {
+                currTeam = ChessGame.TeamColor.BLACK;
+            }
             if (currGame.getGameStatus()) {
-                try {
-                    currGame.makeMove(move);
-                    NotificationMessage gameStatus = null;
-                    if (currGame.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                        currGame.endGame();
-                        gameStatus = new NotificationMessage(String.format("%s is in checkmate. White wins!!", gameData.blackUsername()));
-                    } else if (currGame.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                        currGame.endGame();
-                        gameStatus = new NotificationMessage(String.format("%s is in checkmate. Black wins!!", gameData.whiteUsername()));
-                    } else if (currGame.isInCheck(ChessGame.TeamColor.WHITE)) {
-                        gameStatus = new NotificationMessage(String.format("%s is in check.", gameData.whiteUsername()));
-                    } else if (currGame.isInCheck(ChessGame.TeamColor.BLACK)) {
-                        gameStatus = new NotificationMessage(String.format("%s is in check.", gameData.blackUsername()));
-                    } else if (currGame.isInStalemate(ChessGame.TeamColor.WHITE)) {
-                        currGame.endGame();
-                        gameStatus = new NotificationMessage(String.format("%s is in stalemate. Game is over at a draw.", gameData.whiteUsername()));
-                    } else if (currGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
-                        currGame.endGame();
-                        gameStatus = new NotificationMessage(String.format("%s is in stalemate. Game is over at a draw.", gameData.blackUsername()));
-                    }
-                    dataAccess.updateGameStatus(gameID, currGame);
-                    for (Connection c : connections.connections.values()) {
-                        LoadGameMessage loadGameMessage = new LoadGameMessage(currGame, c.role);
-                        connections.sendRoot(c.key, loadGameMessage);
-                    }
-                    String pastPos = reformat(move.getStartPosition());
-                    String newPos = reformat(move.getEndPosition());
-                    NotificationMessage notificationMessage = null;
-                    if (move.getPromotionPiece() == null) {
-                        notificationMessage = new NotificationMessage(String.format("%s moved %s to %s.", username, pastPos, newPos));
-                    } else {
-                        notificationMessage = new NotificationMessage(String.format("%s moved %s to %s, promoting the pawn to %s.", username, pastPos, newPos, move.getPromotionPiece().toString()));
-                    }
-                    connections.broadcast(key, notificationMessage);
+                if (currGame.getTeamTurn().equals(currTeam)) {
+                    try {
+                        currGame.makeMove(move);
+                        NotificationMessage gameStatus = null;
+                        if (currGame.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                            currGame.endGame();
+                            gameStatus = new NotificationMessage(String.format("%s is in checkmate. White wins!!", gameData.blackUsername()));
+                        } else if (currGame.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                            currGame.endGame();
+                            gameStatus = new NotificationMessage(String.format("%s is in checkmate. Black wins!!", gameData.whiteUsername()));
+                        } else if (currGame.isInCheck(ChessGame.TeamColor.WHITE)) {
+                            gameStatus = new NotificationMessage(String.format("%s is in check.", gameData.whiteUsername()));
+                        } else if (currGame.isInCheck(ChessGame.TeamColor.BLACK)) {
+                            gameStatus = new NotificationMessage(String.format("%s is in check.", gameData.blackUsername()));
+                        } else if (currGame.isInStalemate(ChessGame.TeamColor.WHITE)) {
+                            currGame.endGame();
+                            gameStatus = new NotificationMessage(String.format("%s is in stalemate. Game is over at a draw.", gameData.whiteUsername()));
+                        } else if (currGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                            currGame.endGame();
+                            gameStatus = new NotificationMessage(String.format("%s is in stalemate. Game is over at a draw.", gameData.blackUsername()));
+                        }
+                        dataAccess.updateGameStatus(gameID, currGame);
+                        for (Connection c : connections.connections.values()) {
+                            LoadGameMessage loadGameMessage = new LoadGameMessage(currGame, c.role);
+                            connections.sendRoot(c.key, loadGameMessage);
+                        }
+                        String pastPos = reformat(move.getStartPosition());
+                        String newPos = reformat(move.getEndPosition());
+                        NotificationMessage notificationMessage = null;
+                        if (move.getPromotionPiece() == null) {
+                            notificationMessage = new NotificationMessage(String.format("%s moved %s to %s.", username, pastPos, newPos));
+                        } else {
+                            notificationMessage = new NotificationMessage(String.format("%s moved %s to %s, promoting the pawn to %s.", username, pastPos, newPos, move.getPromotionPiece().toString()));
+                        }
+                        connections.broadcast(key, notificationMessage);
 
-                    if (gameStatus != null) {
-                        connections.broadcast(key, gameStatus);
-                        String msg = GsonServerMessage.getGson().toJson(gameStatus);
+                        if (gameStatus != null) {
+                            connections.broadcast(key, gameStatus);
+                            String msg = GsonServerMessage.getGson().toJson(gameStatus);
+                            try {
+                                session.getRemote().sendString(msg);
+                            } catch (IOException ex) {
+                                //woman shrug emoji
+                            }
+                        }
+                    } catch (InvalidMoveException iMEx) {
+                        ErrorMessage errorMessage = new ErrorMessage("Error: invalid move");
+                        String msg = GsonServerMessage.getGson().toJson(errorMessage);
                         try {
                             session.getRemote().sendString(msg);
                         } catch (IOException ex) {
                             //woman shrug emoji
                         }
                     }
-                } catch (InvalidMoveException iMEx) {
-                    ErrorMessage errorMessage = new ErrorMessage("Error: invalid move");
+                } else {
+                    ErrorMessage errorMessage = new ErrorMessage("Error: It's not your turn!");
                     String msg = GsonServerMessage.getGson().toJson(errorMessage);
                     try {
                         session.getRemote().sendString(msg);
