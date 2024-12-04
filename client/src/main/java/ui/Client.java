@@ -381,7 +381,8 @@ public class Client {
         ChessPiece currPiece = notifHandler.getGame().getBoard().getPiece(currentPos);
         ChessMove move = new ChessMove(currentPos, futurePos, null);
         if (currPiece != null && currPiece.getPieceType()== ChessPiece.PieceType.PAWN) {
-            if ((role.equals("WHITE") && futurePos.getRow() == 8 && currPiece.getTeamColor() == ChessGame.TeamColor.WHITE) || (role.equals("BLACK") && futurePos.getRow() == 1 && currPiece.getTeamColor() == ChessGame.TeamColor.BLACK))
+            if ((role.equals("WHITE") && futurePos.getRow() == 8 && currPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                    || (role.equals("BLACK") && futurePos.getRow() == 1 && currPiece.getTeamColor() == ChessGame.TeamColor.BLACK))
             {
                 System.out.println("Please enter your choice of promotion piece. (BISHOP, ROOK, KNIGHT, QUEEN)");
                 String promo = scanner.nextLine();

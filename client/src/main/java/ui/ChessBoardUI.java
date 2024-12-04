@@ -119,12 +119,7 @@ public class ChessBoardUI {
             drawFrontOfRow(out, row);
             blackSquare = !blackSquare;
             for (int col = 1; col <= 8; col++) {
-                if (possPos != null && possPos.contains(new ChessPosition(row, col))) {
-                    drawSquare(out, row, col, blackSquare, true, currPos);
-                }
-                else {
-                    drawSquare(out, row, col, blackSquare, false, currPos);
-                }
+                determineSquareDraw(out, possPos, currPos, row, col, blackSquare);
                 blackSquare = !blackSquare;
             }
             drawFrontOfRow(out, row);
@@ -141,12 +136,7 @@ public class ChessBoardUI {
             drawFrontOfRow(out, row);
             blackSquare = !blackSquare;
             for (int col = 8; col >= 1; col--) {
-                if (possPos != null && possPos.contains(new ChessPosition(row, col))) {
-                    drawSquare(out, row, col, blackSquare, true, currPos);
-                }
-                else {
-                    drawSquare(out, row, col, blackSquare, false, currPos);
-                }
+                determineSquareDraw(out, possPos, currPos, row, col, blackSquare);
                 blackSquare = !blackSquare;
             }
             drawFrontOfRow(out, row);
@@ -154,5 +144,14 @@ public class ChessBoardUI {
             out.println();
         }
         printAlphaText(out, ChessGame.TeamColor.BLACK);
+    }
+
+    private static void determineSquareDraw(PrintStream out, Set<ChessPosition> possPos, ChessPosition currPos, int row, int col, boolean blackSquare) {
+        if (possPos != null && possPos.contains(new ChessPosition(row, col))) {
+            drawSquare(out, row, col, blackSquare, true, currPos);
+        }
+        else {
+            drawSquare(out, row, col, blackSquare, false, currPos);
+        }
     }
 }

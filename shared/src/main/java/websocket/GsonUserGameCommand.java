@@ -7,12 +7,12 @@ import websocket.commands.UserGameCommand;
 import java.lang.reflect.Type;
 
 public class GsonUserGameCommand {
-    private static final Gson gson = new GsonBuilder()
+    private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(UserGameCommand.class, new UserGameCommandDeserializer())
             .create();
 
     public static Gson getGson() {
-        return gson;
+        return GSON;
     }
 }
 

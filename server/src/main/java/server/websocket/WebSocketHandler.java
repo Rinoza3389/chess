@@ -163,10 +163,12 @@ public class WebSocketHandler {
                             gameStatus = new NotificationMessage(String.format("%s is in check.", gameData.blackUsername()));
                         } else if (currGame.isInStalemate(ChessGame.TeamColor.WHITE)) {
                             currGame.endGame();
-                            gameStatus = new NotificationMessage(String.format("%s is in stalemate. Game is over at a draw.", gameData.whiteUsername()));
+                            gameStatus = new NotificationMessage(String.format("%s is in stalemate. Game is over at a draw.",
+                                    gameData.whiteUsername()));
                         } else if (currGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
                             currGame.endGame();
-                            gameStatus = new NotificationMessage(String.format("%s is in stalemate. Game is over at a draw.", gameData.blackUsername()));
+                            gameStatus = new NotificationMessage(String.format("%s is in stalemate. Game is over at a draw.",
+                                    gameData.blackUsername()));
                         }
                         dataAccess.updateGameStatus(gameID, currGame);
 
@@ -185,7 +187,8 @@ public class WebSocketHandler {
                         if (move.getPromotionPiece() == null) {
                             notificationMessage = new NotificationMessage(String.format("%s moved %s to %s.", username, pastPos, newPos));
                         } else {
-                            notificationMessage = new NotificationMessage(String.format("%s moved %s to %s, promoting the pawn to %s.", username, pastPos, newPos, move.getPromotionPiece().toString()));
+                            notificationMessage = new NotificationMessage(String.format("%s moved %s to %s, promoting the pawn to %s.",
+                                    username, pastPos, newPos, move.getPromotionPiece().toString()));
                         }
                         connections.broadcast(key, notificationMessage);
 

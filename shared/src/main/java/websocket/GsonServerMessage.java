@@ -6,13 +6,13 @@ import websocket.messages.*;
 import java.lang.reflect.Type;
 
 public class GsonServerMessage {
-    private static final Gson gson = new GsonBuilder()
+    private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(ServerMessage.class, new ServerMessageSerializer())
             .registerTypeAdapter(ServerMessage.class, new ServerMessageDeserializer())
             .create();
 
     public static Gson getGson() {
-        return gson;
+        return GSON;
     }
 }
 
