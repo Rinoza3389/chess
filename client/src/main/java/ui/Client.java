@@ -130,7 +130,7 @@ public class Client {
                             "Resign: You forfeit the game and the game is over. :(");
                 }
                 else if (selectedOption == 5) {
-                    leave(scanner);
+                    leave();
                 }
                 else if (selectedOption == 6) {
                     resign(scanner);
@@ -404,7 +404,7 @@ public class Client {
         }
     }
 
-    private static void leave(Scanner scanner) {
+    private static void leave() {
         try {
             ws.leaveGame(currAuthToken, currGame.gameID());
             role = null;
