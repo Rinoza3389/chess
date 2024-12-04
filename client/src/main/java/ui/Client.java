@@ -113,7 +113,11 @@ public class Client {
                         "6: Resign");
                 int selectedOption = scanner.nextInt();
                 if (selectedOption == 1) {
-                    makeMove(scanner);
+                    if (role != null) {
+                        makeMove(scanner);
+                    } else {
+                        System.out.println("Observers cannot make moves.");
+                    }
                 }
                 else if (selectedOption == 2) {
                     highlight(scanner);
@@ -234,6 +238,7 @@ public class Client {
                     else {
                         System.out.println("Sorry. Please try entering role color again.");
                         role = null;
+                        currGame = null;
                     }
                 }
             }
@@ -351,7 +356,7 @@ public class Client {
         System.out.println("Please enter the coordinates for the piece you'd like to view legal moves for.");
         ChessPosition currentPos = getPos(scanner);
         if (currentPos != null) {
-            Collection<ChessMove> legalMoves = currGame.game().validMoves(currentPos);
+            Collection<ChessMove> legalMoves = notifHandler.getGame().validMoves(currentPos);
             if (legalMoves != null) {
                 Set<ChessPosition> possPos = new HashSet<>();
                 for (ChessMove move : legalMoves) {

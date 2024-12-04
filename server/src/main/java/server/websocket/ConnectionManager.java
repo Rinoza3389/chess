@@ -2,6 +2,7 @@ package server.websocket;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.GsonServerMessage;
@@ -21,9 +22,10 @@ public class ConnectionManager {
 
     public void broadcast(String excludeKey, ServerMessage serverMessage) {
         var removeList = new ArrayList<Connection>();
+        Integer gameID = connections.get(excludeKey).gameID;
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                if (!c.key.equals(excludeKey)) {
+                if (!c.key.equals(excludeKey) && Objects.equals(c.gameID, gameID)) {
                     String msg = GsonServerMessage.getGson().toJson(serverMessage);
                     try {
                         c.send(msg);

@@ -34,6 +34,7 @@ public class ChessBoardUI {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
+        out.println();
 
         if (role == null || role.equals("WHITE")) {
             drawWhiteBoard(out, possPos, currPos);
@@ -44,6 +45,7 @@ public class ChessBoardUI {
 
         out.print(RESET_BG_COLOR);
         out.print(RESET_TEXT_COLOR);
+
     }
 
     private static String getPieceSymbol(ChessPiece.PieceType type) {
