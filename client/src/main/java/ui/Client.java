@@ -140,7 +140,15 @@ public class Client {
                     }
                 }
                 else if (selectedOption == 6) {
-                    System.out.println("You chose: resign.");
+                    System.out.println("Are you sure you want to resign?\n1. Yes\n2. No");
+                    int answer = scanner.nextInt();
+                    if (answer == 1) {
+                        try {
+                            ws.resignGame(currAuthToken, currGame.gameID());
+                        } catch (Exception e) {
+                            System.out.println("Error occurred while leaving the game.");
+                        }
+                    }
                 }
                 else {
                     System.out.println("Invalid option entered. Please try again.");

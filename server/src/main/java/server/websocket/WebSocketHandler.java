@@ -47,6 +47,7 @@ public class WebSocketHandler {
                 case CONNECT -> connect(session, username, command.getAuthToken(), command.getGameID());
                 case LEAVE -> leave(username, command.getAuthToken());
                 case MAKE_MOVE -> makeMove(((MakeMoveCommand) command).getMove(), username, command.getAuthToken(), command.getGameID());
+                case RESIGN -> resign(session, username, command.getAuthToken(), command.getGameID());
             }
         } catch (DataAccessException | NullPointerException e) {
             ErrorMessage errorMessage = new ErrorMessage("Error: unauthorized");
@@ -244,5 +245,50 @@ public class WebSocketHandler {
             case 8 -> col = 'h';
         }
         return String.format("%c%d", col, pos.getRow());
+    }
+
+    private void resign(Session session, String username, String authToken, Integer gameID) {
+        String key = username + authToken;
+        Connection currConn = connections.get(key);
+        try {
+            GameData gameData = dataAccess.getGame(gameID);
+            ChessGame currGame = gameData.game();
+            ChessGame.TeamColor currTeam = null;
+            if (gameData.whiteUsername().equals(username)) {
+                currTeam = ChessGame.TeamColor.WHITE;
+            } else if (gameData.blackUsername().equals(username)) {
+                currTeam = ChessGame.TeamColor.BLACK;
+            }
+
+            if (currTeam != null) {
+                currGame.endGame();
+                dataAccess.updateGameStatus(gameID, currGame);
+                NotificationMessage resignMessage = new NotificationMessage(String.format("%s has resigned. The game is now over.", username));
+                connections.broadcast(key, resignMessage);
+                String msg = GsonServerMessage.getGson().toJson(resignMessage);
+                try {
+                    session.getRemote().sendString(msg);
+                } catch (IOException ex) {
+                    //woman shrug emoji
+                }
+            } else {
+                ErrorMessage errorMessage = new ErrorMessage("Error: The observer cannot resign.");
+                String msg = GsonServerMessage.getGson().toJson(errorMessage);
+                try {
+                    session.getRemote().sendString(msg);
+                } catch (IOException ex) {
+                    //woman shrug emoji
+                }
+            }
+
+        } catch (DataAccessException e) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: unauthorized (inside websocket resign)");
+            String msg = GsonServerMessage.getGson().toJson(errorMessage);
+            try {
+                session.getRemote().sendString(msg);
+            } catch (IOException ex) {
+                //woman shrug emoji
+            }
+        }
     }
 }
