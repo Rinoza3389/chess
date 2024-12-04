@@ -103,41 +103,7 @@ public class Client {
             }
 
             else {
-                System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
-                        "1: Make Move\n" +
-                        "2: Highlight Legal Moves\n" +
-                        "3: Redraw Chess Board\n" +
-                        "4: Help\n" +
-                        "5: Leave\n" +
-                        "6: Resign");
-                int selectedOption = scanner.nextInt();
-                if (selectedOption == 1) {
-                    makeMove(scanner);
-                }
-                else if (selectedOption == 2) {
-                    highlight(scanner);
-                }
-                else if (selectedOption == 3) {
-                    notifHandler.run(role);
-                }
-                else if (selectedOption == 4) {
-                    System.out.println("Make Move: Allows you to input what move you want to make.\n" +
-                            "Highlight Legal Moves: Allows you to input the piece for which you want ot highlight legal moves. " +
-                            "The selected piece and all squares it can legally move to will be highlighted.\n" +
-                            "Redraw Chess Board: Redraws the chess board on your screen.\n" +
-                            "Help: Pulls up this menu with information about each option.\n" +
-                            "Leave: Removes you from the game and sends you back to the main menu.\n" +
-                            "Resign: You forfeit the game and the game is over. :(");
-                }
-                else if (selectedOption == 5) {
-                    leave();
-                }
-                else if (selectedOption == 6) {
-                    resign(scanner);
-                }
-                else {
-                    System.out.println("Invalid option entered. Please try again.");
-                }
+                gameplayUI(scanner);
             }
         }
 
@@ -210,19 +176,7 @@ public class Client {
                     System.out.println("Which role would you like to play? (WHITE or BLACK): ");
                     role = scanner.nextLine();
                     if (role.equals("WHITE") || role.equals("BLACK")) {
-                        JoinRequest joinReq = new JoinRequest(currAuthToken, role, currGame.gameID());
-                        var output = FACADE.joinFacade(joinReq);
-                        if (output instanceof String){
-                            System.out.println(output);
-                            currGame = null;
-                        } else {
-                            try {
-                                ws.connectToGame(currAuthToken, currGame.gameID());
-
-                            } catch (Exception e) {
-                                System.out.println(e.getMessage());
-                            }
-                        }
+                        playMeat();
                     }
                     else {
                         System.out.println("Sorry. Please try entering role color again.");
@@ -411,6 +365,60 @@ public class Client {
             currGame = null;
         } catch (Exception e) {
             System.out.println("Error occurred while leaving the game.");
+        }
+    }
+
+    private static void playMeat() {
+        JoinRequest joinReq = new JoinRequest(currAuthToken, role, currGame.gameID());
+        var output = FACADE.joinFacade(joinReq);
+        if (output instanceof String){
+            System.out.println(output);
+            currGame = null;
+        } else {
+            try {
+                ws.connectToGame(currAuthToken, currGame.gameID());
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private static void gameplayUI(Scanner scanner) {
+        System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
+                "1: Make Move\n" +
+                "2: Highlight Legal Moves\n" +
+                "3: Redraw Chess Board\n" +
+                "4: Help\n" +
+                "5: Leave\n" +
+                "6: Resign");
+        int selectedOption = scanner.nextInt();
+        if (selectedOption == 1) {
+            makeMove(scanner);
+        }
+        else if (selectedOption == 2) {
+            highlight(scanner);
+        }
+        else if (selectedOption == 3) {
+            notifHandler.run(role);
+        }
+        else if (selectedOption == 4) {
+            System.out.println("Make Move: Allows you to input what move you want to make.\n" +
+                    "Highlight Legal Moves: Allows you to input the piece for which you want ot highlight legal moves. " +
+                    "The selected piece and all squares it can legally move to will be highlighted.\n" +
+                    "Redraw Chess Board: Redraws the chess board on your screen.\n" +
+                    "Help: Pulls up this menu with information about each option.\n" +
+                    "Leave: Removes you from the game and sends you back to the main menu.\n" +
+                    "Resign: You forfeit the game and the game is over. :(");
+        }
+        else if (selectedOption == 5) {
+            leave();
+        }
+        else if (selectedOption == 6) {
+            resign(scanner);
+        }
+        else {
+            System.out.println("Invalid option entered. Please try again.");
         }
     }
 }
