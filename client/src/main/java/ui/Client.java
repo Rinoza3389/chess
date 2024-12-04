@@ -40,70 +40,67 @@ public class Client {
         System.out.print("Welcome to Maddy's 240 Chess Project!!");
 
         while (true) {
-            if (currAuthToken == null) {
-                System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
-                        "1: Register\n" +
-                        "2: Login\n" +
-                        "3: Quit\n" +
-                        "4: Help");
-                int selectedOption = scanner.nextInt();
-                if (selectedOption == 1) {
-                    register(scanner);
-                } else if (selectedOption == 2) {
-                    login(scanner);
-                } else if (selectedOption == 3) {
-                    System.out.println("Goodbye!!");
-                    break;
-                } else if (selectedOption == 4) {
-                    System.out.println("Register: Allows you to create an account and start playing! " +
-                            "Will require a username, email, and password.\n" +
-                            "Login: Allows you to sign into an already existing account and start playing! " +
-                            "Will require a username and password.\n" +
-                            "Quit: Allows you to exit the game.\n" +
-                            "Help: Pulls up this menu with information about each option.\n");
+            try {
+                if (currAuthToken == null) {
+                    System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
+                            "1: Register\n" +
+                            "2: Login\n" +
+                            "3: Quit\n" +
+                            "4: Help");
+                    int selectedOption = scanner.nextInt();
+                    if (selectedOption == 1) {
+                        register(scanner);
+                    } else if (selectedOption == 2) {
+                        login(scanner);
+                    } else if (selectedOption == 3) {
+                        System.out.println("Goodbye!!");
+                        break;
+                    } else if (selectedOption == 4) {
+                        System.out.println("Register: Allows you to create an account and start playing! " +
+                                "Will require a username, email, and password.\n" +
+                                "Login: Allows you to sign into an already existing account and start playing! " +
+                                "Will require a username and password.\n" +
+                                "Quit: Allows you to exit the game.\n" +
+                                "Help: Pulls up this menu with information about each option.\n");
+                    } else {
+                        System.out.println("Invalid option entered. Please try again.");
+                    }
+                } else if (currGame == null) {
+                    System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
+                            "1: Play Game\n" +
+                            "2: Create Game\n" +
+                            "3: Observe Game\n" +
+                            "4: List Games\n" +
+                            "5: Help\n" +
+                            "6: Logout");
+                    int selectedOption = scanner.nextInt();
+                    if (selectedOption == 1) {
+                        play(scanner);
+                    } else if (selectedOption == 2) {
+                        create(scanner);
+                    } else if (selectedOption == 3) {
+                        observe(scanner);
+                    } else if (selectedOption == 4) {
+                        list();
+                    } else if (selectedOption == 5) {
+                        System.out.println("Play Game: Allows you to join an existing game based on specified game number and color choice.\n" +
+                                "Create Game: Allows you to create a new game with a name of your choosing. " +
+                                "NOTE: You will not automatically join the new game.\n" +
+                                "Observe Game: Allows you to observe an existing game based on a specified game number.\n" +
+                                "List Games: Lists all the games that currently exist.\n" +
+                                "Help: Pulls up this menu with information about each option.\n" +
+                                "Logout: Allows you to logout and return to the run page.");
+                    } else if (selectedOption == 6) {
+                        logout();
+                    } else {
+                        System.out.println("Invalid option entered. Please try again.");
+                    }
                 } else {
-                    System.out.println("Invalid option entered. Please try again.");
+                    gameplayUI(scanner);
                 }
-            }
-            else if (currGame == null){
-                System.out.println("\nPlease select one of the following options by entering the corresponding number.\n" +
-                        "1: Play Game\n" +
-                        "2: Create Game\n" +
-                        "3: Observe Game\n" +
-                        "4: List Games\n" +
-                        "5: Help\n" +
-                        "6: Logout");
-                int selectedOption = scanner.nextInt();
-                if (selectedOption == 1) {
-                    play(scanner);
-                }
-                else if (selectedOption == 2) {
-                    create(scanner);
-                }
-                else if (selectedOption == 3) {
-                    observe(scanner);
-                }
-                else if (selectedOption == 4) {
-                    list();
-                }
-                else if (selectedOption == 5) {
-                    System.out.println("Play Game: Allows you to join an existing game based on specified game number and color choice.\n" +
-                            "Create Game: Allows you to create a new game with a name of your choosing. " +
-                            "NOTE: You will not automatically join the new game.\n" +
-                            "Observe Game: Allows you to observe an existing game based on a specified game number.\n" +
-                            "List Games: Lists all the games that currently exist.\n" +
-                            "Help: Pulls up this menu with information about each option.\n" +
-                            "Logout: Allows you to logout and return to the run page.");
-                }
-                else if (selectedOption == 6) {
-                    logout();
-                } else {
-                    System.out.println("Invalid option entered. Please try again.");
-                }
-            }
-
-            else {
-                gameplayUI(scanner);
+            } catch (InputMismatchException inEx) {
+                System.out.println("Please enter a valid input");
+                scanner.nextLine();
             }
         }
 
@@ -315,33 +312,40 @@ public class Client {
     private static void makeMove(Scanner scanner) {
         System.out.println("Please enter the coordinates for the piece you'd like to move.");
         ChessPosition currentPos = getPos(scanner);
-        System.out.println("Please enter the coordinates for the place you'd like to move to.");
-        ChessPosition futurePos = getPos(scanner);
-        ChessPiece currPiece = notifHandler.getGame().getBoard().getPiece(currentPos);
-        ChessMove move = new ChessMove(currentPos, futurePos, null);
-        if (currPiece != null && currPiece.getPieceType()== ChessPiece.PieceType.PAWN) {
-            if ((role.equals("WHITE") && futurePos.getRow() == 8 && currPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
-                    || (role.equals("BLACK") && futurePos.getRow() == 1 && currPiece.getTeamColor() == ChessGame.TeamColor.BLACK))
-            {
-                System.out.println("Please enter your choice of promotion piece. (BISHOP, ROOK, KNIGHT, QUEEN)");
-                String promo = scanner.nextLine();
-                switch (promo) {
-                    case "QUEEN" : move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.QUEEN);
-                    case "BISHOP" : move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.BISHOP);
-                    case "ROOK" : move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.ROOK);
-                    case "KNIGHT" : move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.KNIGHT);
-                    default :
-                        System.out.println("Please enter a valid promo type.");
-                        move = null;
-                }
+        if (currentPos != null) {
+            System.out.println("Please enter the coordinates for the place you'd like to move to.");
+            ChessPosition futurePos = getPos(scanner);
+            if (futurePos != null) {
+                ChessPiece currPiece = notifHandler.getGame().getBoard().getPiece(currentPos);
+                ChessMove move = new ChessMove(currentPos, futurePos, null);
+                if (currPiece != null && currPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                    if ((role.equals("WHITE") && futurePos.getRow() == 8 && currPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                            || (role.equals("BLACK") && futurePos.getRow() == 1 && currPiece.getTeamColor() == ChessGame.TeamColor.BLACK)) {
+                        System.out.println("Please enter your choice of promotion piece. (BISHOP, ROOK, KNIGHT, QUEEN)");
+                        String promo = scanner.nextLine();
+                        switch (promo) {
+                            case "QUEEN":
+                                move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.QUEEN);
+                            case "BISHOP":
+                                move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.BISHOP);
+                            case "ROOK":
+                                move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.ROOK);
+                            case "KNIGHT":
+                                move = new ChessMove(currentPos, futurePos, ChessPiece.PieceType.KNIGHT);
+                            default:
+                                System.out.println("Please enter a valid promo type.");
+                                move = null;
+                        }
 
-            }
-        }
-        if (move != null) {
-            try {
-                ws.makeMove(move, currAuthToken, currGame.gameID());
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
+                    }
+                }
+                if (move != null) {
+                    try {
+                        ws.makeMove(move, currAuthToken, currGame.gameID());
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
             }
         }
     }
